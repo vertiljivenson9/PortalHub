@@ -3,34 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplicación Web Completa - Un Solo HTML</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>PortalHub Creator - Sube carpetas a GitHub</title>
     <style>
+        /* ===== VARIABLES Y RESET ===== */
         :root {
-            --primary: #4f46e5;
-            --primary-dark: #4338ca;
-            --secondary: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --light: #f8fafc;
-            --dark: #1e293b;
-            --gray: #64748b;
-            --border: #e2e8f0;
-            --radius: 10px;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --primary: #238636;
+            --primary-dark: #196c2e;
+            --secondary: #1f6feb;
+            --danger: #f85149;
+            --warning: #d29922;
+            --success: #238636;
+            --bg-dark: #0d1117;
+            --bg-card: #161b22;
+            --bg-input: #010409;
+            --text-primary: #f0f6fc;
+            --text-secondary: #8b949e;
+            --border: #30363d;
+            --radius: 6px;
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            --transition: all 0.3s ease;
         }
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, sans-serif;
         }
         
         body {
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            color: var(--dark);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
             min-height: 100vh;
             padding: 20px;
         }
@@ -40,9 +44,1216 @@
             margin: 0 auto;
         }
         
+        /* ===== HEADER ===== */
         header {
-            background: white;
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        /* ===== LAYOUT ===== */
+        .app-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        
+        @media (min-width: 992px) {
+            .app-layout {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        /* ===== TARJETAS ===== */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow
+            padding: 25px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+        
+        .card:hover {
+            border-color: var(--primary);
+        }
+        
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            color: var(--text-primary);
+        }
+        
+        .card-title i {
+            color: var(--primary);
+        }
+        
+        /* ===== FORMULARIOS ===== */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .input-group {
+            position: relative;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(35, 134, 54, 0.3);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        .password-toggle:hover {
+            color: var(--text-primary);
+        }
+        
+        /* ===== BOTONES ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 25px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .btn:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: var(--secondary);
+        }
+        
+        .btn-secondary:hover:not(:disabled) {
+            background: #185bcc;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+        }
+        
+        .btn-danger:hover:not(:disabled) {
+            background: #da3633;
+        }
+        
+        /* ===== PANEL DE LOGS ===== */
+        .logs-container {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 15px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .log-entry {
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            border-radius: var(--radius);
+            border-left: 4px solid transparent;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+            word-break: break-word;
+        }
+        
+        .log-info {
+            background: rgba(56, 139, 253, 0.1);
+            border-left-color: var(--secondary);
+            color: #79c0ff;
+        }
+        
+        .log-success {
+            background: rgba(35, 134, 54, 0.1);
+            border-left-color: var(--success);
+            color: #56d364;
+        }
+        
+        .log-warning {
+            background: rgba(187, 128, 9, 0.1);
+            border-left-color: var(--warning);
+            color: #e3b341;
+        }
+        
+        .log-error {
+            background: rgba(248, 81, 73, 0.1);
+            border-left-color: var(--danger);
+            color: #ff7b72;
+        }
+        
+        .log-timestamp {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-right: 10px;
+        }
+        
+        /* ===== ESTADO DE ARCHIVOS ===== */
+        .file-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        /* ===== ESTRUCTURA DE CARPETAS ===== */
+        .folder-tree {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+            margin-top: 15px;
+        }
+        
+        .tree-item {
+            padding: 5px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .tree-icon {
+            color: var(--secondary);
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* ===== PROGRESS BAR ===== */
+        .progress-container {
+            margin-top: 20px;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background: var(--bg-input);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 5px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        /* ===== FOOTER ===== */
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .app-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-portrait logo-icon"></i>
+                <div>
+                    <h1>PortalHub Creator</h1>
+                    <p class="subtitle">Sube carpetas locales a GitHub manteniendo la estructura completa. La carpeta raíz se replicará como "portalHub" en tu repositorio.</p>
+                </div>
+            </div>
+        </header>
+        
+        <main class="app-layout">
+            <!-- Panel de Configuración -->
+            <section>
+                <div class="card">
+                    <h2 class="card-title">
+                        <i class="fas fa-cogs"></i> Configuración de GitHub
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label for="githubToken">
+                            <i class="fas fa-key"></i> Personal Access Token (PAT)
+                        </label>
+                        <div class="input-group">
+                            <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+                            <button type="button" class="password-toggle" id="toggleToken">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <small style="color: var(--text-secondary); display: block; margin-top: 5px;">
+                            Requiere permisos: <code>repo</code>, <code>workflow</code>
+                        </small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="repoOwner">
+                            <i class="fas fa-user"></i> Propietario del Repositorio
+                        </label>
+                        <input type="text" id="repoOwner" placeholder="tu-usuario">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="repoName">
+                            <i class="fas fa-code-branch"></i> Nombre del Repositorio
+                        </label>
+                        <input type="text" id="repoName" placeholder="mi-repositorio">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="commitMessage">
+                            <i class="fas fa-comment"></i> Mensaje del Commit
+                        </label>
+                        <input type="text" id="commitMessage" value="🚀 Subida completa de portalHub" placeholder="Describe los cambios...">
+                    </div>
+                    
+                    <button class="btn" id="saveConfig">
+                        <i class="fas fa-save"></i> Guardar Configuración
+                    </button>
+                </div>
+                
+                <div class="card" style="margin-top: 20px;">
+                    <h2 class="card-title">
+                        <i class="fas fa-folder-open"></i> Seleccionar Carpeta
+                    </h2>
+                    <p style="margin-bottom: 20px; color: var(--text-secondary);">
+                        Selecciona la carpeta local que quieres subir a GitHub. La estructura se replicará dentro de "portalHub/".
+                    </p>
+                    
+                    <button class="btn btn-secondary" id="selectFolder">
+                        <i class="fas fa-folder-plus"></i> Abrir Selector de Carpetas
+                    </button>
+                    
+                    <div id="folderInfo" style="display: none; margin-top: 20px;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                            <i class="fas fa-folder" style="color: var(--secondary); font-size: 1.5rem;"></i>
+                            <div>
+                                <h3 style="font-size: 1.1rem;" id="selectedFolderName"></h3>
+                                <p style="color: var(--text-secondary); font-size: 0.9rem;" id="selectedFolderPath"></p>
+                            </div>
+                        </div>
+                        
+                        <div class="file-stats" id="fileStats">
+                            <!-- Las estadísticas se llenarán con JavaScript -->
+                        </div>
+                        
+                        <div id="folderTree" class="folder-tree">
+                            <!-- La estructura de árbol se generará aquí -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Panel de Control y Logs -->
+            <section>
+                <div class="card">
+                    <h2 class="card-title">
+                        <i class="fas fa-rocket"></i> Replicar en GitHub
+                    </h2>
+                    
+                    <div class="progress-container" style="display: none;" id="progressContainer">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span id="progressStatus">Preparando...</span>
+                            <span id="progressPercent">0%</span>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-secondary" id="replicateBtn" disabled>
+                        <i class="fas fa-cloud-upload-alt"></i> Iniciar Replicación
+                    </button>
+                    
+                    <button class="btn btn-danger" id="cancelBtn" style="display: none; margin-top: 10px;">
+                        <i class="fas fa-stop-circle"></i> Cancelar Proceso
+                    </button>
+                    
+                    <div style="margin-top: 30px;">
+                        <h3 class="card-title">
+                            <i class="fas fa-terminal"></i> Logs en Tiempo Real
+                        </h3>
+                        <div class="logs-container" id="logsContainer">
+                            <div class="log-entry log-info">
+                                <span class="log-timestamp" id="currentTime"></span>
+                                PortalHub Creator listo. Configura tu token de GitHub y selecciona una carpeta.
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; margin-top: 15px;">
+                            <button class="btn" style="padding: 8px 15px; font-size: 0.9rem;" id="clearLogs">
+                                <i class="fas fa-trash"></i> Limpiar Logs
+                            </button>
+                            <button class="btn" style="padding: 8px 15px; font-size: 0.9rem;" id="exportLogs">
+                                <i class="fas fa-download"></i> Exportar Logs
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card" style="margin-top: 20px;">
+                    <h2 class="card-title">
+                        <i class="fas fa-info-circle"></i> Información Importante
+                    </h2>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <h4 style="color: var(--primary); margin-bottom: 8px;">
+                            <i class="fas fa-exclamation-triangle"></i> Requisitos del Navegador
+                        </h4>
+                        <ul style="color: var(--text-secondary); padding-left: 20px;">
+                            <li>Chrome 86+ o Edge 86+</li>
+                            <li>File System Access API habilitada</li>
+                            <li>Conexión a Internet para GitHub API</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <h4 style="color: var(--primary); margin-bottom: 8px;">
+                            <i class="fas fa-shield-alt"></i> Seguridad
+                        </h4>
+                        <p style="color: var(--text-secondary);">
+                            Tu PAT se almacena temporalmente en memoria. Nunca se envía a servidores externos excepto a GitHub API.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h4 style="color: var(--primary); margin-bottom: 8px;">
+                            <i class="fas fa-code"></i> Límites de GitHub
+                        </h4>
+                        <ul style="color: var(--text-secondary); padding-left: 20px;">
+                            <li>Máximo 1000 archivos por commit</li>
+                            <li>Tamaño máximo por archivo: 100MB</li>
+                            <li>Límite de API: 5000 requests/hora</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <footer>
+            <p>PortalHub Creator v1.0 • 100% Frontend • Compatible con GitHub API v3</p>
+            <p style="margin-top: 5px; font-size: 0.8rem;">
+                <i class="fas fa-exclamation-circle"></i> Esta aplicación funciona completamente en tu navegador. No se almacenan datos en servidores externos.
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // ===== VARIABLES GLOBALES =====
+        const GITHUB_API = 'https://api.github.com';
+        let selectedFolderHandle = null;
+        let config = {
+            token: '',
+            owner: '',
+            repo: '',
+            commitMessage: '🚀 Subida completa de portalHub'
+        };
+        let isProcessing = false;
+        let cancelRequested = false;
+        
+        // ===== ELEMENTOS DEL DOM =====
+        const elements = {
+            githubToken: document.getElementById('githubToken'),
+            repoOwner: document.getElementById('repoOwner'),
+            repoName: document.getElementById('repoName'),
+            commitMessage: document.getElementById('commitMessage'),
+            saveConfig: document.getElementById('saveConfig'),
+            selectFolder: document.getElementById('selectFolder'),
+            replicateBtn: document.getElementById('replicateBtn'),
+            cancelBtn: document.getElementById('cancelBtn'),
+            logsContainer: document.getElementById('logsContainer'),
+            folderInfo: document.getElementById('folderInfo'),
+            selectedFolderName: document.getElementById('selectedFolderName'),
+            selectedFolderPath: document.getElementById('selectedFolderPath'),
+            fileStats: document.getElementById('fileStats'),
+            folderTree: document.getElementById('folderTree'),
+            progressContainer: document.getElementById('progressContainer'),
+            progressFill: document.getElementById('progressFill'),
+            progressStatus: document.getElementById('progressStatus'),
+            progressPercent: document.getElementById('progressPercent'),
+            clearLogs: document.getElementById('clearLogs'),
+            exportLogs: document.getElementById('exportLogs'),
+            toggleToken: document.getElementById('toggleToken'),
+            currentTime: document.getElementById('currentTime')
+        };
+        
+        // ===== FUNCIONES DE LOGGING =====
+        function updateCurrentTime() {
+            const now = new Date();
+            elements.currentTime.textContent = now.toLocaleTimeString('es-ES', { 
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+        
+        function addLog(message, type = 'info') {
+            const now = new Date();
+            const timestamp = now.toLocaleTimeString('es-ES', { 
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type}`;
+            logEntry.innerHTML = `
+                <span class="log-timestamp">${timestamp}</span>
+                ${message}
+            `;
+            
+            elements.logsContainer.prepend(logEntry);
+            updateCurrentTime();
+            
+            // Mantener máximo 100 logs
+            const logs = elements.logsContainer.querySelectorAll('.log-entry');
+            if (logs.length > 100) {
+                logs[logs.length - 1].remove();
+            }
+            
+            // Scroll al top
+            elements.logsContainer.scrollTop = 0;
+            
+            // También log en consola
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+        
+        // ===== MANEJO DE CONFIGURACIÓN =====
+        function saveConfig() {
+            config = {
+                token: elements.githubToken.value.trim(),
+                owner: elements.repoOwner.value.trim(),
+                repo: elements.repoName.value.trim(),
+                commitMessage: elements.commitMessage.value.trim() || '🚀 Subida completa de portalHub'
+            };
+            
+            // Validación básica
+            if (!config.token || !config.owner || !config.repo) {
+                addLog('❌ Por favor completa todos los campos de configuración', 'error');
+                return;
+            }
+            
+            if (!config.token.startsWith('ghp_') && !config.token.startsWith('github_pat_')) {
+                addLog('⚠️ El token no tiene el formato esperado de GitHub PAT', 'warning');
+            }
+            
+            addLog('✅ Configuración guardada correctamente', 'success');
+            updateUIState();
+            
+            // Guardar en localStorage
+            localStorage.setItem('portalhub_config', JSON.stringify(config));
+        }
+        
+        function loadConfig() {
+            const saved = localStorage.getItem('portalhub_config');
+            if (saved) {
+                try {
+                    config = JSON.parse(saved);
+                    elements.githubToken.value = config.token;
+                    elements.repoOwner.value = config.owner;
+                    elements.repoName.value = config.repo;
+                    elements.commitMessage.value = config.commitMessage;
+                    addLog('⚙️ Configuración cargada desde almacenamiento local', 'info');
+                } catch (e) {
+                    addLog('⚠️ Error al cargar configuración guardada', 'warning');
+                }
+            }
+        }
+        
+        // ===== MANEJO DE CARPETAS =====
+        async function selectFolder() {
+            if (!window.showDirectoryPicker) {
+                addLog('❌ Tu navegador no soporta la File System Access API', 'error');
+                addLog('📱 Usa Chrome 86+ o Edge 86+ para esta funcionalidad', 'info');
+                return;
+            }
+            
+            try {
+                selectedFolderHandle = await window.showDirectoryPicker();
+                
+                // Mostrar información de la carpeta
+                elements.selectedFolderName.textContent = selectedFolderHandle.name;
+                elements.selectedFolderPath.textContent = 'Carpeta seleccionada';
+                elements.folderInfo.style.display = 'block';
+                
+                addLog(`📁 Carpeta seleccionada: "${selectedFolderHandle.name}"`, 'success');
+                
+                // Escanear la carpeta
+                await scanFolder();
+                
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    addLog('⚠️ Selección de carpeta cancelada', 'warning');
+                } else {
+                    addLog(`❌ Error al seleccionar carpeta: ${error.message}`, 'error');
+                }
+            }
+        }
+        
+        async function scanFolder() {
+            if (!selectedFolderHandle) return;
+            
+            addLog('🔍 Escaneando estructura de carpetas...', 'info');
+            
+            try {
+                const stats = {
+                    files: 0,
+                    folders: 0,
+                    totalSize: 0,
+                    fileTypes: new Map()
+                };
+                
+                const tree = [];
+                
+                // Función recursiva para escanear
+                async function scanDirectory(handle, path = '') {
+                    stats.folders++;
+                    
+                    for await (const entry of handle.values()) {
+                        const entryPath = path ? `${path}/${entry.name}` : entry.name;
+                        
+                        if (entry.kind === 'directory') {
+                            tree.push({
+                                type: 'folder',
+                                path: entryPath,
+                                icon: 'fa-folder'
+                            });
+                            
+                            await scanDirectory(entry, entryPath);
+                        } else {
+                            stats.files++;
+                            tree.push({
+                                type: 'file',
+                                path: entryPath,
+                                icon: getFileIcon(entry.name),
+                                size: await getFileSize(entry)
+                            });
+                            
+                            // Actualizar estadísticas de tamaño
+                            const fileSize = await getFileSize(entry);
+                            stats.totalSize += fileSize;
+                            
+                            // Estadísticas por tipo de archivo
+                            const ext = entry.name.split('.').pop().toLowerCase();
+                            stats.fileTypes.set(ext, (stats.fileTypes.get(ext) || 0) + 1);
+                        }
+                    }
+                }
+                
+                await scanDirectory(selectedFolderHandle);
+                
+                // Mostrar estadísticas
+                updateFileStats(stats);
+                
+                // Mostrar árbol de carpetas (solo primeros 50 elementos)
+                updateFolderTree(tree.slice(0, 50));
+                
+                addLog(`✅ Escaneo completado: ${stats.files} archivos, ${stats.folders} carpetas`, 'success');
+                
+                updateUIState();
+                
+            } catch (error) {
+                addLog(`❌ Error al escanear carpeta: ${error.message}`, 'error');
+            }
+        }
+        
+        async function getFileSize(fileHandle) {
+            try {
+                const file = await fileHandle.getFile();
+                return file.size;
+            } catch {
+                return 0;
+            }
+        }
+        
+        function getFileIcon(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            const iconMap = {
+                'js': 'fa-js',
+                'ts': 'fa-js',
+                'html': 'fa-html5',
+                'css': 'fa-css3',
+                'json': 'fa-code',
+                'md': 'fa-markdown',
+                'txt': 'fa-file-alt',
+                'py': 'fa-python',
+                'java': 'fa-java',
+                'php': 'fa-php',
+                'jpg': 'fa-file-image',
+                'jpeg': 'fa-file-image',
+                'png': 'fa-file-image',
+                'gif': 'fa-file-image',
+                'svg': 'fa-file-image',
+                'pdf': 'fa-file-pdf',
+                'doc': 'fa-file-word',
+                'docx': 'fa-file-word',
+                'xls': 'fa-file-excel',
+                'xlsx': 'fa-file-excel',
+                'zip': 'fa-file-archive',
+                'rar': 'fa-file-archive',
+                '7z': 'fa-file-archive',
+                'mp3': 'fa-file-audio',
+                'mp4': 'fa-file-video'
+            };
+            
+            return iconMap[ext] || 'fa-file';
+        }
+        
+        function updateFileStats(stats) {
+            elements.fileStats.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value">${stats.files}</div>
+                    <div class="stat-label">Archivos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.folders}</div>
+                    <div class="stat-label">Carpetas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${formatBytes(stats.totalSize)}</div>
+                    <div class="stat-label">Tamaño Total</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.fileTypes.size}</div>
+                    <div class="stat-label">Tipos de Archivo</div>
+                </div>
+            `;
+        }
+        
+        function updateFolderTree(treeItems) {
+            let html = '';
+            
+            treeItems.forEach(item => {
+                html += `
+                    <div class="tree-item">
+                        <i class="fas ${item.icon} tree-icon"></i>
+                        <span>${item.path}</span>
+                        ${item.size ? `<span style="color: var(--text-secondary); margin-left: auto; font-size: 0.8rem;">${formatBytes(item.size)}</span>` : ''}
+                    </div>
+                `;
+            });
+            
+            if (treeItems.length > 50) {
+                html += `<div style="color: var(--text-secondary); text-align: center; padding: 10px;">... y ${treeItems.length - 50} elementos más</div>`;
+            }
+            
+            elements.folderTree.innerHTML = html;
+        }
+        
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // ===== FUNCIONES DE GITHUB API =====
+        async function githubRequest(endpoint, options = {}) {
+            if (cancelRequested) {
+                throw new Error('Proceso cancelado por el usuario');
+            }
+            
+            const url = `${GITHUB_API}${endpoint}`;
+            const headers = {
+                'Authorization': `token ${config.token}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'User-Agent': 'PortalHub-Creator',
+                ...options.headers
+            };
+            
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    headers
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(`GitHub API error ${response.status}: ${errorData.message || response.statusText}`);
+                }
+                
+                return await response.json();
+            } catch (error) {
+                if (error.message !== 'Proceso cancelado por el usuario') {
+                    addLog(`❌ Error en API GitHub: ${error.message}`, 'error');
+                }
+                throw error;
+            }
+        }
+        
+        async function getLatestCommitSha() {
+            addLog('🔍 Obteniendo último commit de la rama main...', 'info');
+            
+            try {
+                const ref = await githubRequest(`/repos/${config.owner}/${config.repo}/git/refs/heads/main`);
+                addLog('✅ SHA del último commit obtenido', 'success');
+                return ref.object.sha;
+            } catch (error) {
+                // Si no existe la rama main, intentar con master
+                addLog('⚠️ Rama "main" no encontrada, intentando con "master"...', 'warning');
+                const ref = await githubRequest(`/repos/${config.owner}/${config.repo}/git/refs/heads/master`);
+                addLog('✅ SHA del último commit obtenido (rama master)', 'success');
+                return ref.object.sha;
+            }
+        }
+        
+        async function createTree(files) {
+            addLog('🌳 Creando árbol de archivos en GitHub...', 'info');
+            
+            const tree = files.map(file => ({
+                path: `portalHub/${file.path}`,
+                mode: '100644',
+                type: 'blob',
+                content: file.content
+            }));
+            
+            // GitHub tiene un límite de 1000 archivos por tree
+            if (tree.length > 1000) {
+                addLog('⚠️ Advertencia: Más de 1000 archivos. Se subirán solo los primeros 1000.', 'warning');
+            }
+            
+            const response = await githubRequest(`/repos/${config.owner}/${config.repo}/git/trees`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    tree: tree.slice(0, 1000),
+                    base_tree: null
+                })
+            });
+            
+            addLog(`✅ Árbol creado con ${Math.min(tree.length, 1000)} archivos`, 'success');
+            return response.sha;
+        }
+        
+        async function createCommit(treeSha, parentSha) {
+            addLog('💾 Creando commit...', 'info');
+            
+            const response = await githubRequest(`/repos/${config.owner}/${config.repo}/git/commits`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: config.commitMessage,
+                    tree: treeSha,
+                    parents: [parentSha]
+                })
+            });
+            
+            addLog('✅ Commit creado', 'success');
+            return response.sha;
+        }
+        
+        async function updateBranch(commitSha) {
+            addLog('🔄 Actualizando rama main...', 'info');
+            
+            try {
+                await githubRequest(`/repos/${config.owner}/${config.repo}/git/refs/heads/main`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        sha: commitSha,
+                        force: false
+                    })
+                });
+                addLog('✅ Rama main actualizada', 'success');
+            } catch (error) {
+                // Intentar con master
+                await githubRequest(`/repos/${config.owner}/${config.repo}/git/refs/heads/master`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        sha: commitSha,
+                        force: false
+                    })
+                });
+                addLog('✅ Rama master actualizada', 'success');
+            }
+        }
+        
+        // ===== LÓGICA PRINCIPAL DE REPLICACIÓN =====
+        async function replicateToGitHub() {
+            if (isProcessing || !selectedFolderHandle || !config.token) {
+                return;
+            }
+            
+            isProcessing = true;
+            cancelRequested = false;
+            updateUIState();
+            
+            // Mostrar barra de progreso
+            elements.progressContainer.style.display = 'block';
+            updateProgress(0, 'Preparando archivos...');
+            
+            try {
+                // 1. Validar configuración
+                if (!config.token || !config.owner || !config.repo) {
+                    throw new Error('Configuración de GitHub incompleta');
+                }
+                
+                // 2. Leer todos los archivos recursivamente
+                updateProgress(10, 'Leyendo archivos de la carpeta...');
+                const files = await readAllFiles(selectedFolderHandle);
+                
+                if (files.length === 0) {
+                    throw new Error('La carpeta seleccionada está vacía');
+                }
+                
+                addLog(`📚 ${files.length} archivos listos para subir`, 'info');
+                
+                // 3. Obtener SHA del último commit
+                updateProgress(30, 'Conectando con GitHub...');
+                const parentSha = await getLatestCommitSha();
+                
+                // 4. Crear árbol en GitHub
+                updateProgress(50, 'Subiendo archivos a GitHub...');
+                const treeSha = await createTree(files);
+                
+                // 5. Crear commit
+                updateProgress(80, 'Creando commit...');
+                const commitSha = await createCommit(treeSha, parentSha);
+                
+                // 6. Actualizar rama
+                updateProgress(90, 'Actualizando rama...');
+                await updateBranch(commitSha);
+                
+                // 7. Completado
+                updateProgress(100, '¡Completado!');
+                
+                addLog('🎉 ¡Estructura portalHub subida exitosamente a GitHub!', 'success');
+                addLog(`🔗 Visita: https://github.com/${config.owner}/${config.repo}/tree/main/portalHub`, 'info');
+                
+                // Mostrar resumen
+                setTimeout(() => {
+                    elements.progressContainer.style.display = 'none';
+                }, 3000);
+                
+            } catch (error) {
+                if (error.message !== 'Proceso cancelado por el usuario') {
+                    addLog(`❌ Error en la replicación: ${error.message}`, 'error');
+                    updateProgress(0, `Error: ${error.message}`);
+                } else {
+                    addLog('⚠️ Proceso cancelado por el usuario', 'warning');
+                    updateProgress(0, 'Proceso cancelado');
+                }
+                
+                setTimeout(() => {
+                    elements.progressContainer.style.display = 'none';
+                }, 3000);
+            } finally {
+                isProcessing = false;
+                cancelRequested = false;
+                updateUIState();
+            }
+        }
+        
+        async function readAllFiles(directoryHandle, path = '') {
+            const files = [];
+            
+            for await (const entry of directoryHandle.values()) {
+                if (cancelRequested) {
+                    throw new Error('Proceso cancelado por el usuario');
+                }
+                
+                const entryPath = path ? `${path}/${entry.name}` : entry.name;
+                
+                if (entry.kind === 'file') {
+                    try {
+                        const file = await entry.getFile();
+                        const content = await readFileContent(file);
+                        
+                        files.push({
+                            path: entryPath,
+                            content: content
+                        });
+                        
+                        // Actualizar progreso periódicamente
+                        if (files.length % 10 === 0) {
+                            updateProgress(
+                                10 + (files.length / 1000) * 20,
+                                `Leyendo archivos... (${files.length} procesados)`
+                            );
+                        }
+                        
+                    } catch (error) {
+                        addLog(`⚠️ No se pudo leer el archivo ${entryPath}: ${error.message}`, 'warning');
+                    }
+                } else if (entry.kind === 'directory') {
+                    const subFiles = await readAllFiles(entry, entryPath);
+                    files.push(...subFiles);
+                }
+            }
+            
+            return files;
+        }
+        
+        async function readFileContent(file) {
+            // Para archivos de texto, leer como texto
+            if (file.type.startsWith('text/') || 
+                file.name.match(/\.(txt|md|js|ts|html|css|json|xml|yml|yaml|py|java|c|cpp|cs|php|rb|go|rs|swift)$/i)) {
+                return await file.text();
+            }
+            
+            // Para archivos binarios, usar base64
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    // Convertir ArrayBuffer a base64
+                    const bytes = new Uint8Array(reader.result);
+                    let binary = '';
+                    for (let i = 0; i < bytes.byteLength; i++) {
+                        binary += String.fromCharCode(bytes[i]);
+                    }
+                    resolve(btoa(binary));
+                };
+                reader.onerror = reject;
+                reader.readAsArrayBuffer(file);
+            });
+        }
+        
+        function updateProgress(percent, status) {
+            elements.progressFill.style.width = `${percent}%`;
+            elements.progressStatus.textContent = status;
+            elements.progressPercent.textContent = `${Math.round(percent)}%`;
+        }
+        
+        // ===== MANEJO DE UI =====
+        function updateUIState() {
+            const hasConfig = config.token && config.owner && config.repo;
+            const hasFolder = selectedFolderHandle !== null;
+            
+            elements.replicateBtn.disabled = !hasConfig || !hasFolder || isProcessing;
+            elements.selectFolder.disabled = isProcessing;
+            elements.saveConfig.disabled = isProcessing;
+            
+            if (isProcessing) {
+                elements.replicateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+                elements.cancelBtn.style.display = 'block';
+            } else {
+                elements.replicateBtn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Iniciar Replicación';
+                elements.cancelBtn.style.display = 'none';
+            }
+        }
+        
+        function cancelProcess() {
+            if (isProcessing) {
+                cancelRequested = true;
+                addLog('⏸️ Solicitando cancelación...', 'warning');
+            }
+        }
+        
+        // ===== EVENT LISTENERS =====
+        function setupEventListeners() {
+            // Configuración
+            elements.saveConfig.addEventListener('click', saveConfig);
+            elements.toggleToken.addEventListener('click', () => {
+                const type = elements.githubToken.type === 'password' ? 'text' : 'password';
+                elements.githubToken.type = type;
+                elements.toggleToken.innerHTML = type === 'password' ? 
+                    '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+            });
+            
+            // Carpeta
+            elements.selectFolder.addEventListener('click', selectFolder);
+            
+            // Replicación
+            elements.replicateBtn.addEventListener('click', replicateToGitHub);
+            elements.cancelBtn.addEventListener('click', cancelProcess);
+            
+            // Logs
+            elements.clearLogs.addEventListener('click', () => {
+                elements.logsContainer.innerHTML = '';
+                addLog('📋 Logs limpiados', 'info');
+            });
+            
+            elements.exportLogs.addEventListener('click', () => {
+                const logs = elements.logsContainer.textContent;
+                const blob = new Blob([logs], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `portalhub-logs-${new Date().toISOString().slice(0,10)}.txt`;
+                a.click();
+                URL.revokeObjectURL(url);
+                addLog('💾 Logs exportados como archivo de texto', 'success');
+            });
+            
+            // Auto-guardar al cambiar inputs
+            ['githubToken', 'repoOwner', 'repoName', 'commitMessage'].forEach(id => {
+                document.getElementById(id).addEventListener('change', saveConfig);
+            });
+            
+            // Actualizar hora cada segundo
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 1000);
+        }
+        
+        // ===== INICIALIZACIÓN =====
+        function init() {
+            addLog('🚀 PortalHub Creator inicializado', 'success');
+            addLog('📋 Versión: 1.0 • Navegador: ' + navigator.userAgent.split(' ')[0], 'info');
+            
+            // Cargar configuración guardada
+            loadConfig();
+            
+            // Configurar event listeners
+            setupEventListeners();
+            
+            // Actualizar estado de UI
+            updateUIState();
+            
+            // Verificar compatibilidad del navegador
+            if (!window.showDirectoryPicker) {
+                addLog('⚠️ Advertencia: File System Access API no soportada', 'warning');
+                addLog('💡 Usa Chrome 86+ o Edge 86+ para todas las funciones', 'info');
+            }
+        }
+        
+        // Iniciar la aplicación cuando se carga la página
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
