@@ -1,1145 +1,343 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>PortalHub Creator</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --secondary: #475569;
-            --background: #0f172a;
-            --surface: #1e293b;
-            --surface-light: #334155;
-            --text-primary: #f1f5f9;
-            --text-secondary: #94a3b8;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --error: #ef4444;
-            --border: #475569;
-            --shadow: rgba(0, 0, 0, 0.25);
-            --radius-md: 8px;
-            --radius-lg: 12px;
-            --transition: all 0.2s ease;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            background: var(--background);
-            color: var(--text-primary);
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            line-height: 1.6;
-            min-height: 100vh;
-            padding: 24px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-        }
-        
-        .app-container {
-            width: 100%;
-            max-width: 900px;
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            box-shadow: 0 10px 25px var(--shadow);
-            overflow: hidden;
-        }
-        
-        .app-header {
-            padding: 32px 32px 24px;
-            border-bottom: 1px solid var(--border);
-            background: linear-gradient(135deg, var(--surface) 0%, var(--surface-light) 100%);
-        }
-        
-        .app-title {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            background: linear-gradient(90deg, var(--primary), #60a5fa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .app-subtitle {
-            color: var(--text-secondary);
-            font-size: 15px;
-            font-weight: 400;
-        }
-        
-        .app-content {
-            padding: 32px;
-        }
-        
-        .progress-container {
-            display: flex;
-            margin-bottom: 40px;
-            position: relative;
-        }
-        
-        .progress-line {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            right: 20px;
-            height: 2px;
-            background: var(--border);
-            z-index: 1;
-        }
-        
-        .progress-step {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-            z-index: 2;
-        }
-        
-        .step-circle {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--surface-light);
-            border: 2px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 12px;
-            transition: var(--transition);
-        }
-        
-        .step-circle.active {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: white;
-        }
-        
-        .step-circle.completed {
-            background: var(--success);
-            border-color: var(--success);
-            color: white;
-        }
-        
-        .step-label {
-            font-size: 14px;
-            color: var(--text-secondary);
-            font-weight: 500;
-            text-align: center;
-        }
-        
-        .step-label.active {
-            color: var(--text-primary);
-        }
-        
-        .step-content {
-            display: none;
-        }
-        
-        .step-content.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .section-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            color: var(--text-primary);
-        }
-        
-        .section-description {
-            color: var(--text-secondary);
-            margin-bottom: 24px;
-            font-size: 14px;
-        }
-        
-        .folder-selector {
-            border: 2px dashed var(--border);
-            border-radius: var(--radius-md);
-            padding: 40px 24px;
-            text-align: center;
-            cursor: pointer;
-            transition: var(--transition);
-            background: rgba(30, 41, 59, 0.5);
-        }
-        
-        .folder-selector:hover {
-            border-color: var(--primary);
-            background: rgba(37, 99, 235, 0.05);
-        }
-        
-        .folder-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
-            color: var(--primary);
-        }
-        
-        .folder-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-        
-        .folder-subtitle {
-            color: var(--text-secondary);
-            font-size: 14px;
-            margin-bottom: 16px;
-        }
-        
-        .folder-button {
-            display: inline-block;
-            background: var(--primary);
-            color: white;
-            padding: 10px 24px;
-            border-radius: 6px;
-            font-weight: 500;
-            transition: var(--transition);
-            border: none;
-            cursor: pointer;
-        }
-        
-        .folder-button:hover {
-            background: var(--primary-dark);
-        }
-        
-        .selected-folder {
-            margin-top: 20px;
-            padding: 16px;
-            background: rgba(30, 41, 59, 0.7);
-            border-radius: var(--radius-md);
-            border-left: 4px solid var(--primary);
-        }
-        
-        .folder-path {
-            font-family: 'Monaco', 'Consolas', monospace;
-            font-size: 14px;
-            color: var(--text-primary);
-            word-break: break-all;
-        }
-        
-        .file-count {
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-top: 8px;
-        }
-        
-        .form-group {
-            margin-bottom: 24px;
-        }
-        
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--text-primary);
-        }
-        
-        .form-input {
-            width: 100%;
-            padding: 14px 16px;
-            background: rgba(15, 23, 42, 0.7);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            color: var(--text-primary);
-            font-family: inherit;
-            font-size: 15px;
-            transition: var(--transition);
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-        
-        .form-input::placeholder {
-            color: var(--text-secondary);
-        }
-        
-        .form-hint {
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-top: 6px;
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 16px;
-            margin-top: 32px;
-            padding-top: 24px;
-            border-top: 1px solid var(--border);
-        }
-        
-        .button {
-            padding: 14px 28px;
-            border-radius: var(--radius-md);
-            font-weight: 600;
-            font-size: 15px;
-            cursor: pointer;
-            transition: var(--transition);
-            border: none;
-            font-family: inherit;
-        }
-        
-        .button-primary {
-            background: var(--primary);
-            color: white;
-            flex: 1;
-        }
-        
-        .button-primary:hover:not(:disabled) {
-            background: var(--primary-dark);
-        }
-        
-        .button-secondary {
-            background: transparent;
-            color: var(--text-secondary);
-            border: 1px solid var(--border);
-        }
-        
-        .button-secondary:hover {
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-primary);
-        }
-        
-        .button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .log-container {
-            margin-top: 32px;
-        }
-        
-        .log-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-        
-        .log-title {
-            font-size: 16px;
-            font-weight: 600;
-        }
-        
-        .clear-log {
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 13px;
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 4px;
-        }
-        
-        .clear-log:hover {
-            color: var(--text-primary);
-            background: rgba(255, 255, 255, 0.05);
-        }
-        
-        .log-box {
-            height: 300px;
-            overflow-y: auto;
-            background: rgba(15, 23, 42, 0.7);
-            border-radius: var(--radius-md);
-            padding: 20px;
-            font-family: 'Monaco', 'Consolas', monospace;
-            font-size: 13px;
-            line-height: 1.5;
-            border: 1px solid var(--border);
-        }
-        
-        .log-entry {
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(71, 85, 105, 0.3);
-        }
-        
-        .log-entry:last-child {
-            margin-bottom: 0;
-            border-bottom: none;
-        }
-        
-        .log-time {
-            color: var(--text-secondary);
-            font-size: 12px;
-            margin-right: 10px;
-        }
-        
-        .log-message {
-            color: var(--text-primary);
-        }
-        
-        .log-message.success {
-            color: var(--success);
-        }
-        
-        .log-message.error {
-            color: var(--error);
-        }
-        
-        .log-message.warning {
-            color: var(--warning);
-        }
-        
-        .log-message.info {
-            color: var(--primary);
-        }
-        
-        .status-summary {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 16px;
-            background: rgba(30, 41, 59, 0.7);
-            border-radius: var(--radius-md);
-            margin-bottom: 24px;
-            border-left: 4px solid var(--primary);
-        }
-        
-        .status-icon {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-        
-        .status-icon.pending {
-            background: rgba(245, 158, 11, 0.1);
-            color: var(--warning);
-        }
-        
-        .status-icon.ready {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success);
-        }
-        
-        .status-text {
-            font-size: 14px;
-        }
-        
-        .files-preview {
-            margin-top: 24px;
-        }
-        
-        .files-list {
-            max-height: 200px;
-            overflow-y: auto;
-            background: rgba(15, 23, 42, 0.5);
-            border-radius: var(--radius-md);
-            padding: 16px;
-            font-family: 'Monaco', 'Consolas', monospace;
-            font-size: 13px;
-        }
-        
-        .file-item {
-            padding: 6px 0;
-            color: var(--text-secondary);
-            border-bottom: 1px solid rgba(71, 85, 105, 0.2);
-        }
-        
-        .file-item:last-child {
-            border-bottom: none;
-        }
-        
-        @media (max-width: 768px) {
-            body {
-                padding: 16px;
-            }
-            
-            .app-header, .app-content {
-                padding: 24px 20px;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-            }
-            
-            .progress-step {
-                min-width: 80px;
-            }
-            
-            .step-label {
-                font-size: 12px;
-            }
-        }
-        
-        .hidden-file-input {
-            display: none;
-        }
-    </style>
+<meta charset="UTF-8" />
+<title>PortalHub Creator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<style>
+body {
+  margin: 0;
+  background: #0b0e14;
+  color: #e5e7eb;
+  font-family: ui-monospace, monospace;
+  display: flex;
+  justify-content: center;
+  padding: 30px;
+}
+.app {
+  max-width: 760px;
+  width: 100%;
+  background: #111827;
+  border-radius: 12px;
+  padding: 24px;
+}
+h1 { margin: 0 0 6px; }
+small { color: #9ca3af; }
+
+input, button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  background: #020617;
+  border: 1px solid #1f2937;
+  color: #fff;
+  border-radius: 8px;
+}
+button {
+  background: #6366f1;
+  font-weight: 600;
+  cursor: pointer;
+}
+button.secondary {
+  background: #020617;
+  border-style: dashed;
+}
+button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+.log {
+  margin-top: 16px;
+  height: 240px;
+  overflow-y: auto;
+  background: #020617;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+.selected-folder {
+  margin-top: 10px;
+  padding: 8px;
+  background: #1e293b;
+  border-radius: 6px;
+  font-size: 11px;
+  border-left: 3px solid #6366f1;
+}
+.file-count {
+  color: #9ca3af;
+  font-size: 11px;
+  margin-top: 4px;
+}
+</style>
 </head>
+
 <body>
-    <div class="app-container">
-        <header class="app-header">
-            <h1 class="app-title">PortalHub Creator</h1>
-            <p class="app-subtitle">Despliega estructuras de carpetas en repositorios GitHub</p>
-        </header>
-        
-        <div class="app-content">
-            <!-- Progress Steps -->
-            <div class="progress-container">
-                <div class="progress-line"></div>
-                
-                <div class="progress-step">
-                    <div class="step-circle active" id="step1-circle">1</div>
-                    <div class="step-label active">Seleccionar Carpeta</div>
-                </div>
-                
-                <div class="progress-step">
-                    <div class="step-circle" id="step2-circle">2</div>
-                    <div class="step-label">Configurar GitHub</div>
-                </div>
-                
-                <div class="progress-step">
-                    <div class="step-circle" id="step3-circle">3</div>
-                    <div class="step-label">Desplegar</div>
-                </div>
-            </div>
-            
-            <!-- Step 1: Folder Selection -->
-            <div class="step-content active" id="step1-content">
-                <h2 class="section-title">Seleccionar Carpeta Local</h2>
-                <p class="section-description">Selecciona la carpeta que contiene la estructura que deseas desplegar en GitHub.</p>
-                
-                <div class="folder-selector" id="folderSelector">
-                    <div class="folder-icon">📁</div>
-                    <h3 class="folder-title">Seleccionar Carpeta</h3>
-                    <p class="folder-subtitle">Haz clic para explorar y seleccionar una carpeta de tu dispositivo</p>
-                    <div class="folder-button">Examinar Carpeta</div>
-                </div>
-                
-                <div class="selected-folder" id="selectedFolder" style="display: none;">
-                    <div class="folder-path" id="folderPath"></div>
-                    <div class="file-count" id="fileCount"></div>
-                </div>
-                
-                <div class="files-preview" id="filesPreview" style="display: none;">
-                    <h3 class="section-title">Vista Previa de Archivos</h3>
-                    <div class="files-list" id="filesList"></div>
-                </div>
-                
-                <div class="action-buttons">
-                    <button class="button button-secondary" onclick="previousStep()" style="visibility: hidden;">Anterior</button>
-                    <button class="button button-primary" onclick="nextStep()" id="nextStep1" disabled>Siguiente: Configuración GitHub</button>
-                </div>
-            </div>
-            
-            <!-- Step 2: GitHub Configuration -->
-            <div class="step-content" id="step2-content">
-                <h2 class="section-title">Configuración de GitHub</h2>
-                <p class="section-description">Proporciona tus credenciales de GitHub y los detalles del repositorio.</p>
-                
-                <div class="form-group">
-                    <label class="form-label" for="githubToken">Token de Acceso Personal de GitHub</label>
-                    <input type="password" class="form-input" id="githubToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
-                    <p class="form-hint">Necesitas un token con permisos "repo" para acceder a repositorios. <a href="https://github.com/settings/tokens" target="_blank" style="color: var(--primary); text-decoration: none;">Generar token</a></p>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="repoOwner">Propietario del Repositorio</label>
-                    <input type="text" class="form-input" id="repoOwner" placeholder="nombre-usuario-o-organizacion">
-                    <p class="form-hint">Tu nombre de usuario de GitHub o el nombre de la organización.</p>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="repoName">Nombre del Repositorio</label>
-                    <input type="text" class="form-input" id="repoName" placeholder="nombre-repositorio">
-                    <p class="form-hint">Nombre del repositorio donde se desplegará la estructura.</p>
-                </div>
-                
-                <div class="status-summary" id="configStatus">
-                    <div class="status-icon pending">
-                        <span>!</span>
-                    </div>
-                    <div class="status-text">Completa todos los campos para continuar.</div>
-                </div>
-                
-                <div class="action-buttons">
-                    <button class="button button-secondary" onclick="previousStep()">Anterior</button>
-                    <button class="button button-primary" onclick="nextStep()" id="nextStep2" disabled>Siguiente: Revisar y Desplegar</button>
-                </div>
-            </div>
-            
-            <!-- Step 3: Deploy -->
-            <div class="step-content" id="step3-content">
-                <h2 class="section-title">Revisar y Desplegar</h2>
-                <p class="section-description">Revisa la configuración y despliega la estructura en GitHub.</p>
-                
-                <div class="status-summary" id="deployStatus">
-                    <div class="status-icon pending">
-                        <span>!</span>
-                    </div>
-                    <div class="status-text">Listo para desplegar. Revisa la configuración a continuación.</div>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Resumen de la Configuración</label>
-                    <div style="background: rgba(15, 23, 42, 0.7); border-radius: var(--radius-md); padding: 20px;">
-                        <div style="margin-bottom: 12px;">
-                            <div style="font-size: 13px; color: var(--text-secondary);">Carpeta seleccionada:</div>
-                            <div id="summaryFolder" style="font-family: 'Monaco', 'Consolas', monospace; font-size: 14px; margin-top: 4px;">-</div>
-                        </div>
-                        <div style="margin-bottom: 12px;">
-                            <div style="font-size: 13px; color: var(--text-secondary);">Archivos a desplegar:</div>
-                            <div id="summaryFiles" style="font-family: 'Monaco', 'Consolas', monospace; font-size: 14px; margin-top: 4px;">0</div>
-                        </div>
-                        <div style="margin-bottom: 12px;">
-                            <div style="font-size: 13px; color: var(--text-secondary);">Repositorio de destino:</div>
-                            <div id="summaryRepo" style="font-family: 'Monaco', 'Consolas', monospace; font-size: 14px; margin-top: 4px;">-</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="action-buttons">
-                    <button class="button button-secondary" onclick="previousStep()">Anterior</button>
-                    <button class="button button-primary" onclick="deployToGitHub()" id="deployButton" disabled>Iniciar Despliegue</button>
-                </div>
-                
-                <div class="log-container">
-                    <div class="log-header">
-                        <h3 class="log-title">Registro de Actividad</h3>
-                        <button class="clear-log" onclick="clearLog()">Limpiar Registro</button>
-                    </div>
-                    <div class="log-box" id="logBox"></div>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="app">
+
+<h1>PortalHub Creator</h1>
+<small>Selecciona carpeta → configura GitHub → publica</small>
+
+<!-- PASO 1: carpeta -->
+<button class="secondary" onclick="selectFolder()">📂 Seleccionar carpeta local</button>
+<div id="selectedFolder" class="selected-folder" style="display: none;">
+  <div id="folderPath"></div>
+  <div id="fileCount" class="file-count"></div>
+</div>
+
+<!-- PASO 2: credenciales -->
+<input id="token" type="password" placeholder="GitHub Token (ghp_…)" />
+<input id="owner" placeholder="Repository owner (ej: vertiljivenson9)" />
+<input id="repo" placeholder="Repository name (ej: Prueba)" />
+
+<!-- PASO 3: deploy -->
+<button id="deployBtn" onclick="deploy()" disabled>🚀 Publicar en GitHub</button>
+
+<div class="log" id="log"></div>
+
+<!-- Input oculto para selección de carpeta -->
+<input type="file" id="folderInput" webkitdirectory multiple style="display: none;" />
+
+</div>
+
+<script>
+let files = [];
+let folderName = '';
+const logBox = document.getElementById("log");
+const deployBtn = document.getElementById("deployBtn");
+const tokenInput = document.getElementById("token");
+const ownerInput = document.getElementById("owner");
+const repoInput = document.getElementById("repo");
+const folderInput = document.getElementById("folderInput");
+
+function log(msg) {
+  const d = document.createElement("div");
+  d.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+  logBox.appendChild(d);
+  logBox.scrollTop = logBox.scrollHeight;
+}
+
+/* ========= PASO 1: CARPETA ========= */
+async function selectFolder() {
+  folderInput.click();
+}
+
+// Manejar selección de carpeta
+folderInput.addEventListener('change', async function(e) {
+  files = [];
+  const fileList = e.target.files;
+  
+  if (!fileList || fileList.length === 0) {
+    log("Selección cancelada");
+    return;
+  }
+  
+  // Obtener nombre de carpeta
+  const firstFile = fileList[0];
+  folderName = firstFile.webkitRelativePath.split('/')[0];
+  
+  log(`Carpeta seleccionada: "${folderName}"`);
+  log(`Leyendo ${fileList.length} archivos...`);
+  
+  // Mostrar información de carpeta
+  document.getElementById('selectedFolder').style.display = 'block';
+  document.getElementById('folderPath').textContent = folderName;
+  document.getElementById('fileCount').textContent = `${fileList.length} archivos detectados`;
+  
+  // Leer archivos
+  for (let i = 0; i < fileList.length; i++) {
+    const file = fileList[i];
+    const relativePath = file.webkitRelativePath;
     
-    <!-- Hidden file input for folder selection -->
-    <input type="file" id="folderInput" class="hidden-file-input" webkitdirectory multiple>
+    // Remover nombre de carpeta del path
+    const pathWithoutFolder = relativePath.substring(folderName.length + 1);
     
-    <script>
-        // State management
-        const state = {
-            currentStep: 1,
-            files: [],
-            folderName: '',
-            githubToken: '',
-            repoOwner: '',
-            repoName: ''
-        };
+    try {
+      const content = await readFileAsText(file);
+      files.push({
+        path: pathWithoutFolder,
+        content: content
+      });
+    } catch (error) {
+      log(`Error leyendo ${pathWithoutFolder}: ${error.message}`);
+    }
+  }
+  
+  log(`Estructura cargada (${files.length} archivos)`);
+  validate();
+  
+  // Limpiar input
+  folderInput.value = '';
+});
+
+function readFileAsText(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => resolve(e.target.result);
+    reader.onerror = (e) => reject(new Error('No se pudo leer el archivo'));
+    reader.readAsText(file);
+  });
+}
+
+/* ========= VALIDACIÓN ========= */
+function validate() {
+  const token = tokenInput.value.trim();
+  const owner = ownerInput.value.trim();
+  const repo  = repoInput.value.trim();
+  deployBtn.disabled = !(files.length && token && owner && repo);
+}
+
+tokenInput.oninput = validate;
+ownerInput.oninput = validate;
+repoInput.oninput = validate;
+
+/* ========= PASO 3: GITHUB ========= */
+async function gh(url, method, token, body) {
+  const response = await fetch(url, {
+    method,
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Accept': 'application/vnd.github.v3+json',
+      'Content-Type': 'application/json'
+    },
+    body: body ? JSON.stringify(body) : null
+  });
+  
+  if (!response.ok) {
+    let errorMsg = `Error ${response.status}`;
+    try {
+      const errorData = await response.json();
+      errorMsg = errorData.message || errorMsg;
+    } catch {}
+    throw new Error(errorMsg);
+  }
+  
+  return await response.json();
+}
+
+async function deploy() {
+  const token = tokenInput.value.trim();
+  const owner = ownerInput.value.trim();
+  const repo  = repoInput.value.trim();
+
+  deployBtn.disabled = true;
+  log("Publicando estructura portalHub…");
+
+  try {
+    // 1. Verificar si existe la rama main
+    let ref;
+    try {
+      ref = await gh(
+        `https://api.github.com/repos/${owner}/${repo}/git/refs/heads/main`,
+        "GET", token
+      );
+      log(`✅ Rama main encontrada: ${ref.object.sha.substring(0, 8)}`);
+    } catch (error) {
+      if (error.message.includes('404') || error.message.includes('Not Found')) {
+        log("⚠️ Repositorio vacío. Creando README inicial...");
         
-        // DOM Elements
-        const stepCircles = [
-            document.getElementById('step1-circle'),
-            document.getElementById('step2-circle'),
-            document.getElementById('step3-circle')
-        ];
+        // Crear README.md inicial
+        const readmeContent = `# ${repo}\n\nRepositorio creado automáticamente por PortalHub Creator\n\n**Fecha**: ${new Date().toLocaleDateString()}\n**Archivos a subir**: ${files.length}\n\n---\n\nEsta carpeta será poblada con la estructura PortalHub.`;
         
-        const stepContents = [
-            document.getElementById('step1-content'),
-            document.getElementById('step2-content'),
-            document.getElementById('step3-content')
-        ];
+        // Crear blob del README
+        const readmeBlob = await gh(
+          `https://api.github.com/repos/${owner}/${repo}/git/blobs`,
+          "POST", token, {
+            content: btoa(readmeContent),
+            encoding: "base64"
+          }
+        );
         
-        // Initialize application
-        document.addEventListener('DOMContentLoaded', function() {
-            log('PortalHub Creator iniciado. Haz clic en "Examinar Carpeta" para comenzar.', 'info');
-            
-            // Set up folder selector
-            const folderSelector = document.getElementById('folderSelector');
-            const folderInput = document.getElementById('folderInput');
-            
-            folderSelector.addEventListener('click', function() {
-                folderInput.click();
-            });
-            
-            // Handle folder selection
-            folderInput.addEventListener('change', handleFolderSelection);
-            
-            // Set up GitHub input validation
-            document.getElementById('githubToken').addEventListener('input', validateStep2);
-            document.getElementById('repoOwner').addEventListener('input', validateStep2);
-            document.getElementById('repoName').addEventListener('input', validateStep2);
-        });
+        // Crear árbol inicial con README
+        const initialTree = await gh(
+          `https://api.github.com/repos/${owner}/${repo}/git/trees`,
+          "POST", token, {
+            tree: [{
+              path: "README.md",
+              mode: "100644",
+              type: "blob",
+              sha: readmeBlob.sha
+            }]
+          }
+        );
         
-        // Handle folder selection
-        async function handleFolderSelection(event) {
-            const files = event.target.files;
-            
-            if (!files || files.length === 0) {
-                log('Selección de carpeta cancelada.', 'info');
-                return;
-            }
-            
-            // Reset state
-            state.files = [];
-            state.folderName = '';
-            
-            // Get folder name from first file's path
-            const firstFilePath = files[0].webkitRelativePath;
-            const folderName = firstFilePath.split('/')[0];
-            state.folderName = folderName;
-            
-            log(`Carpeta seleccionada: "${folderName}"`, 'success');
-            log(`Procesando ${files.length} archivos...`, 'info');
-            
-            // Process files
-            const filePromises = [];
-            
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                const relativePath = file.webkitRelativePath;
-                
-                // Skip if not in the selected folder
-                if (!relativePath.startsWith(folderName + '/')) {
-                    continue;
-                }
-                
-                filePromises.push(new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        // Remove folder name from path
-                        const pathWithoutFolder = relativePath.substring(folderName.length + 1);
-                        
-                        resolve({
-                            path: pathWithoutFolder,
-                            content: e.target.result,
-                            name: file.name,
-                            size: file.size
-                        });
-                    };
-                    reader.onerror = function() {
-                        log(`Error al leer archivo: ${relativePath}`, 'warning');
-                        resolve(null);
-                    };
-                    reader.readAsText(file);
-                }));
-            }
-            
-            // Show processing message
-            const processingInterval = setInterval(() => {
-                log(`Procesando archivos... (${state.files.length}/${filePromises.length})`, 'info');
-            }, 500);
-            
-            // Wait for all files to be processed
-            const results = await Promise.all(filePromises);
-            clearInterval(processingInterval);
-            
-            // Filter out null results (failed reads)
-            state.files = results.filter(file => file !== null);
-            
-            // Update UI
-            document.getElementById('folderPath').textContent = folderName;
-            document.getElementById('fileCount').textContent = `${state.files.length} archivos listos`;
-            document.getElementById('selectedFolder').style.display = 'block';
-            
-            // Update file preview
-            updateFilePreview();
-            
-            // Enable next step button
-            document.getElementById('nextStep1').disabled = false;
-            
-            log(`✅ Carpeta cargada exitosamente: ${state.files.length} archivos procesados.`, 'success');
-        }
+        // Crear commit inicial
+        const initialCommit = await gh(
+          `https://api.github.com/repos/${owner}/${repo}/git/commits`,
+          "POST", token, {
+            message: "Initial commit: PortalHub structure",
+            tree: initialTree.sha,
+            parents: []
+          }
+        );
         
-        // Update file preview
-        function updateFilePreview() {
-            const filesList = document.getElementById('filesList');
-            const filesPreview = document.getElementById('filesPreview');
-            
-            if (state.files.length === 0) {
-                filesPreview.style.display = 'none';
-                return;
-            }
-            
-            // Show first 15 files
-            const previewFiles = state.files.slice(0, 15);
-            filesList.innerHTML = '';
-            
-            previewFiles.forEach(file => {
-                const fileItem = document.createElement('div');
-                fileItem.className = 'file-item';
-                fileItem.textContent = file.path;
-                filesList.appendChild(fileItem);
-            });
-            
-            if (state.files.length > 15) {
-                const moreItem = document.createElement('div');
-                moreItem.className = 'file-item';
-                moreItem.textContent = `... y ${state.files.length - 15} archivos más`;
-                filesList.appendChild(moreItem);
-            }
-            
-            filesPreview.style.display = 'block';
-        }
+        // Crear rama main
+        ref = await gh(
+          `https://api.github.com/repos/${owner}/${repo}/git/refs`,
+          "POST", token, {
+            ref: "refs/heads/main",
+            sha: initialCommit.sha
+          }
+        );
         
-        // Step navigation
-        function nextStep() {
-            if (state.currentStep < 3) {
-                // Validate before proceeding
-                if (state.currentStep === 1 && state.files.length === 0) {
-                    log('Error: Debes seleccionar una carpeta primero.', 'error');
-                    return;
-                }
-                
-                if (state.currentStep === 2) {
-                    state.githubToken = document.getElementById('githubToken').value.trim();
-                    state.repoOwner = document.getElementById('repoOwner').value.trim();
-                    state.repoName = document.getElementById('repoName').value.trim();
-                    
-                    if (!state.githubToken || !state.repoOwner || !state.repoName) {
-                        log('Error: Completa todos los campos de GitHub.', 'error');
-                        return;
-                    }
-                    
-                    updateDeploymentSummary();
-                }
-                
-                // Hide current step
-                stepContents[state.currentStep - 1].classList.remove('active');
-                stepCircles[state.currentStep - 1].classList.remove('active');
-                
-                // Update step
-                state.currentStep++;
-                
-                // Show next step
-                stepContents[state.currentStep - 1].classList.add('active');
-                stepCircles[state.currentStep - 1].classList.add('active');
-                
-                // Mark previous step as completed
-                if (state.currentStep > 1) {
-                    stepCircles[state.currentStep - 2].classList.add('completed');
-                }
-                
-                log(`Navegando al paso ${state.currentStep}.`, 'info');
-            }
-        }
-        
-        function previousStep() {
-            if (state.currentStep > 1) {
-                // Hide current step
-                stepContents[state.currentStep - 1].classList.remove('active');
-                stepCircles[state.currentStep - 1].classList.remove('active');
-                
-                // Remove completed mark
-                stepCircles[state.currentStep - 1].classList.remove('completed');
-                
-                // Update step
-                state.currentStep--;
-                
-                // Show previous step
-                stepContents[state.currentStep - 1].classList.add('active');
-                stepCircles[state.currentStep - 1].classList.add('active');
-                
-                log(`Volviendo al paso ${state.currentStep}.`, 'info');
-            }
-        }
-        
-        // Validate Step 2
-        function validateStep2() {
-            const token = document.getElementById('githubToken').value.trim();
-            const owner = document.getElementById('repoOwner').value.trim();
-            const repo = document.getElementById('repoName').value.trim();
-            
-            const isValid = token && owner && repo;
-            document.getElementById('nextStep2').disabled = !isValid;
-            
-            const configStatus = document.getElementById('configStatus');
-            const statusIcon = configStatus.querySelector('.status-icon');
-            const statusText = configStatus.querySelector('.status-text');
-            
-            if (isValid) {
-                statusIcon.className = 'status-icon ready';
-                statusIcon.innerHTML = '✓';
-                statusText.textContent = 'Configuración completa. Listo para continuar.';
-            } else {
-                statusIcon.className = 'status-icon pending';
-                statusIcon.innerHTML = '!';
-                statusText.textContent = 'Completa todos los campos para continuar.';
-            }
-            
-            return isValid;
-        }
-        
-        // Update deployment summary
-        function updateDeploymentSummary() {
-            document.getElementById('summaryFolder').textContent = state.folderName;
-            document.getElementById('summaryFiles').textContent = `${state.files.length} archivos`;
-            document.getElementById('summaryRepo').textContent = `${state.repoOwner}/${state.repoName}`;
-            
-            const deployButton = document.getElementById('deployButton');
-            deployButton.disabled = state.files.length === 0;
-        }
-        
-        // Deploy to GitHub
-        async function deployToGitHub() {
-            if (state.files.length === 0) {
-                log('Error: No hay archivos para desplegar.', 'error');
-                return;
-            }
-            
-            if (!state.githubToken || !state.repoOwner || !state.repoName) {
-                log('Error: Configuración de GitHub incompleta.', 'error');
-                return;
-            }
-            
-            const deployButton = document.getElementById('deployButton');
-            const originalText = deployButton.textContent;
-            deployButton.disabled = true;
-            deployButton.textContent = 'Desplegando...';
-            
-            const deployStatus = document.getElementById('deployStatus');
-            const statusIcon = deployStatus.querySelector('.status-icon');
-            const statusText = deployStatus.querySelector('.status-text');
-            
-            statusIcon.className = 'status-icon pending';
-            statusIcon.innerHTML = '⟳';
-            statusText.textContent = 'Conectando con GitHub...';
-            
-            log('Iniciando despliegue en GitHub...', 'info');
-            
-            try {
-                // Check repository status
-                let parentCommitSha = null;
-                let baseTreeSha = null;
-                
-                try {
-                    // Try to get main branch
-                    const refResponse = await githubRequest(`repos/${state.repoOwner}/${state.repoName}/git/refs/heads/main`, 'GET');
-                    parentCommitSha = refResponse.object.sha;
-                    
-                    // Get commit tree
-                    const commitResponse = await githubRequest(`repos/${state.repoOwner}/${state.repoName}/git/commits/${parentCommitSha}`, 'GET');
-                    baseTreeSha = commitResponse.tree.sha;
-                    
-                    log(`Repositorio encontrado. Commit actual: ${parentCommitSha.substring(0, 8)}`, 'success');
-                    
-                } catch (error) {
-                    if (error.status === 404) {
-                        log('Repositorio vacío detectado. Creando README inicial...', 'info');
-                        
-                        // Create README.md for empty repository
-                        const readmeContent = `# ${state.repoName}\n\nEstructura desplegada automáticamente por PortalHub Creator.\n\n**Fecha:** ${new Date().toLocaleDateString()}\n**Archivos:** ${state.files.length}\n\nEste repositorio contiene una estructura de portal desplegada automáticamente.`;
-                        
-                        // Create README blob
-                        const readmeBlob = await githubRequest(
-                            `repos/${state.repoOwner}/${state.repoName}/git/blobs`,
-                            'POST',
-                            {
-                                content: btoa(readmeContent),
-                                encoding: 'base64'
-                            }
-                        );
-                        
-                        log('README.md creado exitosamente.', 'success');
-                        
-                        // Create initial tree
-                        const initialTree = await githubRequest(
-                            `repos/${state.repoOwner}/${state.repoName}/git/trees`,
-                            'POST',
-                            {
-                                tree: [{
-                                    path: 'README.md',
-                                    mode: '100644',
-                                    type: 'blob',
-                                    sha: readmeBlob.sha
-                                }]
-                            }
-                        );
-                        
-                        baseTreeSha = initialTree.sha;
-                        
-                        // Create initial commit
-                        const initialCommit = await githubRequest(
-                            `repos/${state.repoOwner}/${state.repoName}/git/commits`,
-                            'POST',
-                            {
-                                message: 'Initial commit: PortalHub structure',
-                                tree: initialTree.sha,
-                                parents: []
-                            }
-                        );
-                        
-                        // Create main branch
-                        await githubRequest(
-                            `repos/${state.repoOwner}/${state.repoName}/git/refs`,
-                            'POST',
-                            {
-                                ref: 'refs/heads/main',
-                                sha: initialCommit.sha
-                            }
-                        );
-                        
-                        parentCommitSha = initialCommit.sha;
-                        log('Repositorio inicializado exitosamente.', 'success');
-                        
-                    } else {
-                        throw error;
-                    }
-                }
-                
-                // Create tree with all files
-                log(`Creando árbol con ${state.files.length} archivos...`, 'info');
-                
-                const treeItems = state.files.map(file => ({
-                    path: `portalHub/${file.path}`,
-                    mode: '100644',
-                    type: 'blob',
-                    content: file.content
-                }));
-                
-                // Create new tree
-                const newTree = await githubRequest(
-                    `repos/${state.repoOwner}/${state.repoName}/git/trees`,
-                    'POST',
-                    {
-                        tree: treeItems,
-                        base_tree: baseTreeSha
-                    }
-                );
-                
-                log(`Árbol creado: ${newTree.sha.substring(0, 8)}`, 'success');
-                
-                // Create new commit
-                log('Creando commit...', 'info');
-                const newCommit = await githubRequest(
-                    `repos/${state.repoOwner}/${state.repoName}/git/commits`,
-                    'POST',
-                    {
-                        message: `PortalHub: ${state.files.length} archivos - ${new Date().toLocaleDateString()}`,
-                        tree: newTree.sha,
-                        parents: parentCommitSha ? [parentCommitSha] : []
-                    }
-                );
-                
-                // Update main branch
-                await githubRequest(
-                    `repos/${state.repoOwner}/${state.repoName}/git/refs/heads/main`,
-                    'PATCH',
-                    {
-                        sha: newCommit.sha,
-                        force: false
-                    }
-                );
-                
-                // Success
-                statusIcon.className = 'status-icon ready';
-                statusIcon.innerHTML = '✓';
-                statusText.textContent = `Despliegue completado. ${state.files.length} archivos publicados.`;
-                
-                deployButton.disabled = false;
-                deployButton.textContent = originalText;
-                
-                stepCircles[2].classList.add('completed');
-                
-                log(`✅ DESPLIEGUE EXITOSO: ${state.files.length} archivos publicados en portalHub/`, 'success');
-                log(`🔗 Repositorio: https://github.com/${state.repoOwner}/${state.repoName}`, 'info');
-                
-            } catch (error) {
-                statusIcon.className = 'status-icon error';
-                statusIcon.innerHTML = '✗';
-                statusText.textContent = 'Error en el despliegue.';
-                
-                deployButton.disabled = false;
-                deployButton.textContent = originalText;
-                
-                log(`❌ ERROR: ${error.message}`, 'error');
-                
-                if (error.status === 401) {
-                    log('Token de GitHub inválido o expirado.', 'error');
-                } else if (error.status === 403) {
-                    log('Sin permisos. Verifica que el token tenga acceso "repo".', 'error');
-                } else if (error.status === 404) {
-                    log('Repositorio no encontrado. Verifica el nombre.', 'error');
-                }
-            }
-        }
-        
-        // GitHub API helper
-        async function githubRequest(endpoint, method = 'GET', body = null) {
-            const url = `https://api.github.com/${endpoint}`;
-            const headers = {
-                'Authorization': `token ${state.githubToken}`,
-                'Accept': 'application/vnd.github.v3+json',
-                'Content-Type': 'application/json'
-            };
-            
-            const options = {
-                method,
-                headers
-            };
-            
-            if (body) {
-                options.body = JSON.stringify(body);
-            }
-            
-            const response = await fetch(url, options);
-            
-            if (!response.ok) {
-                let errorMessage = `HTTP ${response.status}`;
-                try {
-                    const errorData = await response.json();
-                    errorMessage = errorData.message || errorMessage;
-                } catch (e) {
-                    // Ignore JSON parse errors
-                }
-                
-                const error = new Error(errorMessage);
-                error.status = response.status;
-                throw error;
-            }
-            
-            if (response.status === 204) {
-                return null;
-            }
-            
-            return await response.json();
-        }
-        
-        // Logging
-        function log(message, type = 'info') {
-            const logBox = document.getElementById('logBox');
-            const entry = document.createElement('div');
-            entry.className = 'log-entry';
-            
-            const time = document.createElement('span');
-            time.className = 'log-time';
-            time.textContent = new Date().toLocaleTimeString([], { 
-                hour: '2-digit', 
-                minute: '2-digit', 
-                second: '2-digit' 
-            });
-            
-            const msg = document.createElement('span');
-            msg.className = `log-message ${type}`;
-            msg.textContent = message;
-            
-            entry.appendChild(time);
-            entry.appendChild(msg);
-            
-            logBox.appendChild(entry);
-            logBox.scrollTop = logBox.scrollHeight;
-        }
-        
-        function clearLog() {
-            document.getElementById('logBox').innerHTML = '';
-            log('Registro limpiado.', 'info');
-        }
-    </script>
+        log("✅ README.md creado y rama main inicializada");
+      } else {
+        throw error;
+      }
+    }
+
+    // 2. Crear árbol con los archivos
+    const treeItems = files.map(f => ({
+      path: `portalHub/${f.path}`,
+      mode: "100644",
+      type: "blob",
+      content: f.content
+    }));
+
+    const tree = await gh(
+      `https://api.github.com/repos/${owner}/${repo}/git/trees`,
+      "POST", token, { tree: treeItems }
+    );
+
+    // 3. Crear commit
+    const commit = await gh(
+      `https://api.github.com/repos/${owner}/${repo}/git/commits`,
+      "POST", token, {
+        message: `PortalHub: ${files.length} archivos\n\nCarpeta: ${folderName}\nFecha: ${new Date().toLocaleString()}`,
+        tree: tree.sha,
+        parents: ref ? [ref.object.sha] : []
+      }
+    );
+
+    // 4. Actualizar rama main
+    await gh(
+      `https://api.github.com/repos/${owner}/${repo}/git/refs/heads/main`,
+      "PATCH", token, { 
+        sha: commit.sha, 
+        force: false 
+      }
+    );
+
+    log("✅ ✅ Publicación completada exitosamente!");
+    log(`📁 Archivos disponibles en: https://github.com/${owner}/${repo}/tree/main/portalHub`);
+    log(`🔗 Repositorio: https://github.com/${owner}/${repo}`);
+    
+  } catch (e) {
+    log("❌ Error: " + e.message);
+    
+    // Mensajes específicos para errores comunes
+    if (e.message.includes('Bad credentials')) {
+      log("⚠️ Token inválido o expirado. Genera uno nuevo en GitHub Settings > Tokens");
+    } else if (e.message.includes('Not Found')) {
+      log("⚠️ Repositorio no encontrado. Verifica usuario y nombre del repo");
+    } else if (e.message.includes('rate limit')) {
+      log("⚠️ Límite de API alcanzado. Espera 1 hora o usa autenticación");
+    }
+    
+    deployBtn.disabled = false;
+  }
+}
+</script>
 </body>
 </html>
