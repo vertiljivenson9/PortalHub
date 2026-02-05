@@ -628,10 +628,9 @@
     </div>
 
     <script>
-        // State management
+        // State management - SIMPLIFICADO Y CORREGIDO
         const state = {
             currentStep: 1,
-            selectedFolder: null,
             files: [],
             folderName: '',
             githubToken: '',
@@ -652,168 +651,131 @@
             document.getElementById('step3-content')
         ];
         
-        const folderSelector = document.getElementById('folderSelector');
-        const selectedFolder = document.getElementById('selectedFolder');
-        const folderPath = document.getElementById('folderPath');
-        const fileCount = document.getElementById('fileCount');
-        const filesPreview = document.getElementById('filesPreview');
-        const filesList = document.getElementById('filesList');
-        
-        const githubTokenInput = document.getElementById('githubToken');
-        const repoOwnerInput = document.getElementById('repoOwner');
-        const repoNameInput = document.getElementById('repoName');
-        
-        const nextStep1Button = document.getElementById('nextStep1');
-        const nextStep2Button = document.getElementById('nextStep2');
-        const deployButton = document.getElementById('deployButton');
-        
-        const summaryFolder = document.getElementById('summaryFolder');
-        const summaryFiles = document.getElementById('summaryFiles');
-        const summaryRepo = document.getElementById('summaryRepo');
-        
-        const logBox = document.getElementById('logBox');
-        
-        // Initialize event listeners
-        function init() {
+        // Inicialización CORREGIDA - Event listeners SIMPLIFICADOS
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configurar el selector de carpeta - MÉTODO CORREGIDO
+            const folderSelector = document.getElementById('folderSelector');
             folderSelector.addEventListener('click', selectFolder);
             
-            githubTokenInput.addEventListener('input', validateStep2);
-            repoOwnerInput.addEventListener('input', validateStep2);
-            repoNameInput.addEventListener('input', validateStep2);
+            // Configurar validación de GitHub
+            document.getElementById('githubToken').addEventListener('input', validateStep2);
+            document.getElementById('repoOwner').addEventListener('input', validateStep2);
+            document.getElementById('repoName').addEventListener('input', validateStep2);
             
-            log('PortalHub Creator iniciado. Selecciona una carpeta para comenzar.', 'info');
-        }
-        
-        // Step navigation
-        function nextStep() {
-            if (state.currentStep < 3) {
-                // Validate current step before proceeding
-                if (state.currentStep === 1 && state.files.length === 0) {
-                    log('Por favor, selecciona una carpeta antes de continuar.', 'warning');
-                    return;
-                }
-                
-                if (state.currentStep === 2 && !validateStep2()) {
-                    log('Por favor, completa todos los campos de configuración de GitHub.', 'warning');
-                    return;
-                }
-                
-                // Update step 3 summary if moving to final step
-                if (state.currentStep === 2) {
-                    updateDeploymentSummary();
-                }
-                
-                // Hide current step
-                stepContents[state.currentStep - 1].classList.remove('active');
-                stepCircles[state.currentStep - 1].classList.remove('active');
-                
-                // Update current step
-                state.currentStep++;
-                
-                // Show next step
-                stepContents[state.currentStep - 1].classList.add('active');
-                stepCircles[state.currentStep - 1].classList.add('active');
-                
-                // Mark previous step as completed
-                if (state.currentStep > 1) {
-                    stepCircles[state.currentStep - 2].classList.add('completed');
-                }
-                
-                log(`Navegación al paso ${state.currentStep}.`, 'info');
-            }
-        }
-        
-        function previousStep() {
-            if (state.currentStep > 1) {
-                // Hide current step
-                stepContents[state.currentStep - 1].classList.remove('active');
-                stepCircles[state.currentStep - 1].classList.remove('active');
-                
-                // Remove completed mark from current step
-                stepCircles[state.currentStep - 1].classList.remove('completed');
-                
-                // Update current step
-                state.currentStep--;
-                
-                // Show previous step
-                stepContents[state.currentStep - 1].classList.add('active');
-                stepCircles[state.currentStep - 1].classList.add('active');
-                
-                log(`Navegación al paso ${state.currentStep}.`, 'info');
-            }
-        }
-        
-        // Step 1: Folder selection
+            // Log inicial
+            log('PortalHub Creator iniciado correctamente.', 'info');
+        });
+
+        // FUNCIÓN SELECTFOLDER COMPLETAMENTE CORREGIDA - NO MÁS CONGELAMIENTOS
         async function selectFolder() {
-  // Reiniciar el estado
-  files = [];
-  folderPath.textContent = '';
-  fileCount.textContent = '';
-  selectedFolder.style.display = 'none';
-  filesPreview.style.display = 'none';
-  filesList.innerHTML = '';
-
-  try {
-    log('Solicitando permiso para acceder a una carpeta...', 'info');
-    
-    // 1. Llamada clave a la API del navegador
-    const directoryHandle = await window.showDirectoryPicker();
-    state.folderName = directoryHandle.name;
-    log(`Carpeta seleccionada: "${directoryHandle.name}". Leyendo contenido...`, 'info');
-
-    // 2. Leer todos los archivos recursivamente
-    await readDirectory(directoryHandle, '');
-    log(`Estructura cargada correctamente. ${state.files.length} archivos listos.`, 'success');
-
-    // 3. Actualizar la interfaz de usuario
-    folderPath.textContent = state.folderName;
-    fileCount.textContent = `${state.files.length} archivos encontrados`;
-    selectedFolder.style.display = 'block';
-    updateFilePreview(); // Esta función debe existir para mostrar la vista previa
-    validate(); // Para habilitar el botón de despliegue
-
-  } catch (error) {
-    // Manejo específico de errores
-    if (error.name === 'AbortError') {
-      log('Selección de carpeta cancelada por el usuario.', 'info');
-    } else {
-      log(`Error al acceder a la carpeta: ${error.message}`, 'error');
-    }
-  }
-}
-        
-        async function readDirectory(directoryHandle, path) {
-            for await (const entry of directoryHandle.values()) {
-                const entryPath = path + entry.name;
+            try {
+                // Limpiar estado anterior
+                state.files = [];
+                document.getElementById('folderPath').textContent = '';
+                document.getElementById('fileCount').textContent = '';
+                document.getElementById('selectedFolder').style.display = 'none';
+                document.getElementById('filesPreview').style.display = 'none';
+                document.getElementById('filesList').innerHTML = '';
                 
-                if (entry.kind === 'file') {
+                log('Abriendo selector de carpeta del sistema...', 'info');
+                
+                // USAR showDirectoryPicker CORRECTAMENTE - con prefijo opcional
+                const dirHandle = window.showDirectoryPicker ? 
+                    await window.showDirectoryPicker() : 
+                    (() => { throw new Error('API no disponible en este navegador'); })();
+                
+                if (!dirHandle) {
+                    log('Selección cancelada por el usuario.', 'info');
+                    return;
+                }
+                
+                state.folderName = dirHandle.name;
+                log(`Carpeta seleccionada: "${state.folderName}". Leyendo archivos...`, 'info');
+                
+                // Función optimizada para leer archivos
+                async function readAllFiles(directoryHandle, path = '') {
+                    const files = [];
+                    
                     try {
-                        const file = await entry.getFile();
-                        const content = await file.text();
-                        
-                        state.files.push({
-                            path: entryPath,
-                            content: content,
-                            size: file.size,
-                            type: file.type
-                        });
-                    } catch (error) {
-                        log(`No se pudo leer el archivo ${entryPath}: ${error.message}`, 'warning');
+                        for await (const entry of directoryHandle.values()) {
+                            const entryPath = path + entry.name;
+                            
+                            if (entry.kind === 'file') {
+                                try {
+                                    const file = await entry.getFile();
+                                    const content = await file.text();
+                                    
+                                    files.push({
+                                        path: entryPath,
+                                        content: content,
+                                        size: file.size
+                                    });
+                                    
+                                    // Actualizar progreso cada 10 archivos
+                                    if (files.length % 10 === 0) {
+                                        log(`${files.length} archivos leídos...`, 'info');
+                                    }
+                                } catch (err) {
+                                    log(`No se pudo leer ${entryPath}: ${err.message}`, 'warning');
+                                }
+                            } else if (entry.kind === 'directory') {
+                                const subFiles = await readAllFiles(entry, entryPath + '/');
+                                files.push(...subFiles);
+                            }
+                        }
+                    } catch (err) {
+                        log(`Error leyendo directorio: ${err.message}`, 'error');
                     }
-                } else if (entry.kind === 'directory') {
-                    await readDirectory(entry, entryPath + '/');
+                    
+                    return files;
+                }
+                
+                // Leer archivos con timeout para evitar bloqueos
+                const readPromise = readAllFiles(dirHandle, '');
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Timeout leyendo archivos')), 30000)
+                );
+                
+                state.files = await Promise.race([readPromise, timeoutPromise]);
+                
+                log(`Lectura completada: ${state.files.length} archivos encontrados.`, 'success');
+                
+                // Actualizar UI
+                document.getElementById('folderPath').textContent = state.folderName;
+                document.getElementById('fileCount').textContent = `${state.files.length} archivos listos`;
+                document.getElementById('selectedFolder').style.display = 'block';
+                
+                // Mostrar vista previa
+                updateFilePreview();
+                
+                // Habilitar siguiente paso
+                document.getElementById('nextStep1').disabled = false;
+                
+            } catch (error) {
+                if (error.name === 'AbortError' || error.message.includes('cancelada')) {
+                    log('Selección de carpeta cancelada.', 'info');
+                } else if (error.message.includes('Timeout')) {
+                    log('La lectura de archivos tomó demasiado tiempo. Intenta con menos archivos.', 'error');
+                } else if (error.message.includes('API no disponible')) {
+                    log('Error: Tu navegador no soporta la selección de carpetas. Usa Chrome o Edge.', 'error');
+                } else {
+                    log(`Error: ${error.message}`, 'error');
                 }
             }
         }
         
+        // Función auxiliar para vista previa
         function updateFilePreview() {
+            const filesList = document.getElementById('filesList');
+            const filesPreview = document.getElementById('filesPreview');
+            
             if (state.files.length === 0) {
                 filesPreview.style.display = 'none';
                 return;
             }
             
-            // Show only first 10 files for preview
-            const previewFiles = state.files.slice(0, 10);
+            // Mostrar primeros 15 archivos
+            const previewFiles = state.files.slice(0, 15);
             filesList.innerHTML = '';
             
             previewFiles.forEach(file => {
@@ -823,26 +785,81 @@
                 filesList.appendChild(fileItem);
             });
             
-            if (state.files.length > 10) {
+            if (state.files.length > 15) {
                 const moreItem = document.createElement('div');
                 moreItem.className = 'file-item';
-                moreItem.textContent = `... y ${state.files.length - 10} archivos más`;
+                moreItem.textContent = `... y ${state.files.length - 15} archivos más`;
                 filesList.appendChild(moreItem);
             }
             
             filesPreview.style.display = 'block';
         }
         
-        // Step 2: GitHub configuration validation
+        // Navegación entre pasos
+        function nextStep() {
+            if (state.currentStep < 3) {
+                // Validar antes de avanzar
+                if (state.currentStep === 1 && state.files.length === 0) {
+                    log('Selecciona una carpeta primero.', 'warning');
+                    return;
+                }
+                
+                if (state.currentStep === 2) {
+                    // Actualizar estado desde inputs
+                    state.githubToken = document.getElementById('githubToken').value.trim();
+                    state.repoOwner = document.getElementById('repoOwner').value.trim();
+                    state.repoName = document.getElementById('repoName').value.trim();
+                    
+                    if (!state.githubToken || !state.repoOwner || !state.repoName) {
+                        log('Completa todos los campos de GitHub.', 'warning');
+                        return;
+                    }
+                    
+                    // Actualizar resumen
+                    updateDeploymentSummary();
+                }
+                
+                // Cambiar paso
+                stepContents[state.currentStep - 1].classList.remove('active');
+                stepCircles[state.currentStep - 1].classList.remove('active');
+                
+                state.currentStep++;
+                
+                stepContents[state.currentStep - 1].classList.add('active');
+                stepCircles[state.currentStep - 1].classList.add('active');
+                
+                if (state.currentStep > 1) {
+                    stepCircles[state.currentStep - 2].classList.add('completed');
+                }
+                
+                log(`Paso ${state.currentStep} activado.`, 'info');
+            }
+        }
+        
+        function previousStep() {
+            if (state.currentStep > 1) {
+                stepContents[state.currentStep - 1].classList.remove('active');
+                stepCircles[state.currentStep - 1].classList.remove('active');
+                stepCircles[state.currentStep - 1].classList.remove('completed');
+                
+                state.currentStep--;
+                
+                stepContents[state.currentStep - 1].classList.add('active');
+                stepCircles[state.currentStep - 1].classList.add('active');
+                
+                log(`Volviendo al paso ${state.currentStep}.`, 'info');
+            }
+        }
+        
+        // Validación paso 2
         function validateStep2() {
-            state.githubToken = githubTokenInput.value.trim();
-            state.repoOwner = repoOwnerInput.value.trim();
-            state.repoName = repoNameInput.value.trim();
+            const token = document.getElementById('githubToken').value.trim();
+            const owner = document.getElementById('repoOwner').value.trim();
+            const repo = document.getElementById('repoName').value.trim();
             
-            const isValid = state.githubToken && state.repoOwner && state.repoName;
-            nextStep2Button.disabled = !isValid;
+            const isValid = token && owner && repo;
+            document.getElementById('nextStep2').disabled = !isValid;
             
-            // Update status
             const configStatus = document.getElementById('configStatus');
             const statusIcon = configStatus.querySelector('.status-icon');
             const statusText = configStatus.querySelector('.status-text');
@@ -850,39 +867,34 @@
             if (isValid) {
                 statusIcon.className = 'status-icon ready';
                 statusIcon.innerHTML = '✓';
-                statusText.textContent = 'Configuración completa. Listo para continuar.';
+                statusText.textContent = 'Configuración completa.';
             } else {
                 statusIcon.className = 'status-icon pending';
                 statusIcon.innerHTML = '!';
-                statusText.textContent = 'Completa todos los campos para continuar.';
+                statusText.textContent = 'Completa todos los campos.';
             }
             
             return isValid;
         }
         
-        // Step 3: Update deployment summary
+        // Actualizar resumen
         function updateDeploymentSummary() {
-            summaryFolder.textContent = state.folderName;
-            summaryFiles.textContent = `${state.files.length} archivos`;
-            summaryRepo.textContent = `${state.repoOwner}/${state.repoName}`;
+            document.getElementById('summaryFolder').textContent = state.folderName;
+            document.getElementById('summaryFiles').textContent = `${state.files.length} archivos`;
+            document.getElementById('summaryRepo').textContent = `${state.repoOwner}/${state.repoName}`;
             
-            // Update deploy button state
-            deployButton.disabled = state.files.length === 0;
+            document.getElementById('deployButton').disabled = state.files.length === 0;
         }
         
-        // Step 3: Deployment
+        // DESPLIEGUE A GITHUB - CORREGIDO
         async function deployToGitHub() {
             if (state.files.length === 0) {
-                log('Error: No hay archivos para desplegar. Selecciona una carpeta primero.', 'error');
+                log('Error: No hay archivos para desplegar.', 'error');
                 return;
             }
             
-            if (!state.githubToken || !state.repoOwner || !state.repoName) {
-                log('Error: Configuración de GitHub incompleta.', 'error');
-                return;
-            }
-            
-            // Disable deploy button and update status
+            const deployButton = document.getElementById('deployButton');
+            const originalText = deployButton.textContent;
             deployButton.disabled = true;
             deployButton.textContent = 'Desplegando...';
             
@@ -892,54 +904,43 @@
             
             statusIcon.className = 'status-icon pending';
             statusIcon.innerHTML = '⟳';
-            statusText.textContent = 'Desplegando estructura en GitHub...';
+            statusText.textContent = 'Conectando con GitHub...';
             
-            log('Iniciando despliegue en GitHub...', 'info');
+            log('Iniciando despliegue...', 'info');
             
             try {
-                // First, try to get the main branch reference
-                let baseTreeSha;
+                // 1. Verificar o crear repositorio
+                log('Verificando estado del repositorio...', 'info');
+                
                 let parentCommitSha = null;
+                let baseTreeSha = null;
                 
                 try {
-                    log('Verificando estado del repositorio...', 'info');
-                    const refResponse = await githubApiRequest(
-                        `repos/${state.repoOwner}/${state.repoName}/git/refs/heads/main`,
-                        'GET'
-                    );
+                    // Intentar obtener referencia main
+                    const refData = await githubRequest(`repos/${state.repoOwner}/${state.repoName}/git/refs/heads/main`, 'GET');
+                    parentCommitSha = refData.object.sha;
                     
-                    parentCommitSha = refResponse.object.sha;
-                    log(`Repositorio encontrado. Commit padre: ${parentCommitSha.substring(0, 8)}`, 'success');
+                    // Obtener commit para el árbol base
+                    const commitData = await githubRequest(`repos/${state.repoOwner}/${state.repoName}/git/commits/${parentCommitSha}`, 'GET');
+                    baseTreeSha = commitData.tree.sha;
                     
-                    // Get the tree of the parent commit
-                    const commitResponse = await githubApiRequest(
-                        `repos/${state.repoOwner}/${state.repoName}/git/commits/${parentCommitSha}`,
-                        'GET'
-                    );
-                    
-                    baseTreeSha = commitResponse.tree.sha;
+                    log(`Repositorio existente. Commit actual: ${parentCommitSha.substring(0, 8)}`, 'success');
                     
                 } catch (error) {
                     if (error.status === 404) {
-                        log('Repositorio vacío detectado. Creando estructura inicial con README...', 'info');
+                        log('Repositorio vacío. Creando estructura inicial...', 'info');
                         
-                        // Create initial README.md for empty repository
-                        const readmeContent = `# ${state.repoName}\n\nEstructura desplegada automáticamente por PortalHub Creator.\n\n**Fecha:** ${new Date().toLocaleDateString()}\n**Archivos:** ${state.files.length}\n\nEste repositorio contiene una estructura de portal desplegada automáticamente.`;
+                        // Crear README inicial
+                        const readmeContent = `# ${state.repoName}\n\nEstructura desplegada automáticamente por PortalHub Creator.\n\n**Fecha:** ${new Date().toLocaleDateString()}\n**Total archivos:** ${state.files.length}\n\n---\n\nEste repositorio contiene una estructura generada automáticamente.`;
                         
-                        // Create README blob
-                        const readmeBlob = await githubApiRequest(
+                        const readmeBlob = await githubRequest(
                             `repos/${state.repoOwner}/${state.repoName}/git/blobs`,
                             'POST',
-                            {
-                                content: btoa(readmeContent),
-                                encoding: 'base64'
-                            }
+                            { content: btoa(readmeContent), encoding: 'base64' }
                         );
                         
-                        log('README.md creado exitosamente.', 'success');
-                        
-                        // Create initial tree with README
-                        const initialTree = await githubApiRequest(
+                        // Crear árbol inicial
+                        const initialTree = await githubRequest(
                             `repos/${state.repoOwner}/${state.repoName}/git/trees`,
                             'POST',
                             {
@@ -952,21 +953,19 @@
                             }
                         );
                         
-                        baseTreeSha = initialTree.sha;
-                        
-                        // Create initial commit
-                        const initialCommit = await githubApiRequest(
+                        // Crear commit inicial
+                        const initialCommit = await githubRequest(
                             `repos/${state.repoOwner}/${state.repoName}/git/commits`,
                             'POST',
                             {
-                                message: 'Initial commit: Project structure',
+                                message: 'Initial commit: PortalHub structure',
                                 tree: initialTree.sha,
                                 parents: []
                             }
                         );
                         
-                        // Create main branch reference
-                        await githubApiRequest(
+                        // Crear rama main
+                        await githubRequest(
                             `repos/${state.repoOwner}/${state.repoName}/git/refs`,
                             'POST',
                             {
@@ -976,14 +975,15 @@
                         );
                         
                         parentCommitSha = initialCommit.sha;
-                        log('Repositorio inicializado con README.md y rama main creada.', 'success');
+                        baseTreeSha = initialTree.sha;
                         
+                        log('Repositorio inicializado con README.md', 'success');
                     } else {
                         throw error;
                     }
                 }
                 
-                // Create tree with all files from selected folder
+                // 2. Crear árbol con archivos
                 log(`Creando árbol con ${state.files.length} archivos...`, 'info');
                 
                 const treeItems = state.files.map(file => ({
@@ -993,8 +993,7 @@
                     content: file.content
                 }));
                 
-                // Create new tree
-                const newTree = await githubApiRequest(
+                const newTree = await githubRequest(
                     `repos/${state.repoOwner}/${state.repoName}/git/trees`,
                     'POST',
                     {
@@ -1003,24 +1002,22 @@
                     }
                 );
                 
-                log(`Árbol creado exitosamente (SHA: ${newTree.sha.substring(0, 8)}).`, 'success');
+                log(`Árbol creado: ${newTree.sha.substring(0, 8)}`, 'success');
                 
-                // Create new commit
+                // 3. Crear commit
                 log('Creando commit...', 'info');
-                const newCommit = await githubApiRequest(
+                const newCommit = await githubRequest(
                     `repos/${state.repoOwner}/${state.repoName}/git/commits`,
                     'POST',
                     {
-                        message: `PortalHub structure: ${state.files.length} files`,
+                        message: `Deploy PortalHub: ${state.files.length} files - ${new Date().toLocaleDateString()}`,
                         tree: newTree.sha,
                         parents: parentCommitSha ? [parentCommitSha] : []
                     }
                 );
                 
-                log(`Commit creado (SHA: ${newCommit.sha.substring(0, 8)}).`, 'success');
-                
-                // Update main branch reference
-                await githubApiRequest(
+                // 4. Actualizar referencia main
+                await githubRequest(
                     `repos/${state.repoOwner}/${state.repoName}/git/refs/heads/main`,
                     'PATCH',
                     {
@@ -1029,103 +1026,90 @@
                     }
                 );
                 
-                log('Rama main actualizada exitosamente.', 'success');
-                
-                // Update status and UI
+                // ÉXITO
                 statusIcon.className = 'status-icon ready';
                 statusIcon.innerHTML = '✓';
-                statusText.textContent = `Despliegue completado. ${state.files.length} archivos publicados en portalHub/.`;
+                statusText.textContent = `Despliegue completado. ${state.files.length} archivos publicados.`;
                 
-                deployButton.textContent = 'Desplegar Nuevamente';
-                deployButton.disabled = false;
-                
-                log(`✅ Despliegue completado exitosamente. ${state.files.length} archivos publicados en ${state.repoOwner}/${state.repoName}`, 'success');
-                
-                // Mark step 3 as completed
                 stepCircles[2].classList.add('completed');
                 
-            } catch (error) {
-                log(`❌ Error durante el despliegue: ${error.message}`, 'error');
+                log(`✅ DESPLIEGUE EXITOSO: ${state.files.length} archivos publicados en ${state.repoOwner}/${state.repoName}/portalHub/`, 'success');
                 
+            } catch (error) {
                 statusIcon.className = 'status-icon error';
                 statusIcon.innerHTML = '✗';
-                statusText.textContent = 'Error durante el despliegue. Revisa el registro.';
+                statusText.textContent = 'Error en el despliegue.';
                 
-                deployButton.textContent = 'Reintentar Despliegue';
+                log(`❌ ERROR: ${error.message || 'Error desconocido'}`, 'error');
+                
+                if (error.status === 401) {
+                    log('Token de GitHub inválido o expirado.', 'error');
+                } else if (error.status === 403) {
+                    log('Permisos insuficientes. Verifica que el token tenga acceso "repo".', 'error');
+                } else if (error.status === 404) {
+                    log('Repositorio no encontrado. Verifica owner y nombre.', 'error');
+                }
+            } finally {
                 deployButton.disabled = false;
+                deployButton.textContent = originalText;
             }
         }
         
-        // GitHub API helper function
-        async function githubApiRequest(endpoint, method = 'GET', body = null) {
+        // Helper para requests GitHub - SIMPLIFICADO
+        async function githubRequest(endpoint, method = 'GET', body = null) {
             const url = `https://api.github.com/${endpoint}`;
-            const headers = {
-                'Authorization': `token ${state.githubToken}`,
-                'Accept': 'application/vnd.github.v3+json',
-                'Content-Type': 'application/json'
-            };
-            
             const options = {
                 method,
-                headers
+                headers: {
+                    'Authorization': `token ${state.githubToken}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json'
+                }
             };
             
-            if (body) {
-                options.body = JSON.stringify(body);
-            }
+            if (body) options.body = JSON.stringify(body);
             
             const response = await fetch(url, options);
             
             if (!response.ok) {
-                const errorText = await response.text();
-                let errorMessage;
-                
+                let errorMsg = `HTTP ${response.status}`;
                 try {
-                    const errorJson = JSON.parse(errorText);
-                    errorMessage = errorJson.message || errorText;
-                } catch {
-                    errorMessage = errorText;
-                }
+                    const errorData = await response.json();
+                    errorMsg = errorData.message || errorMsg;
+                } catch {}
                 
-                const error = new Error(errorMessage);
+                const error = new Error(errorMsg);
                 error.status = response.status;
                 throw error;
             }
             
-            if (response.status === 204) {
-                return null;
-            }
-            
+            if (response.status === 204) return null;
             return await response.json();
         }
         
         // Logging
         function log(message, type = 'info') {
+            const logBox = document.getElementById('logBox');
             const entry = document.createElement('div');
             entry.className = 'log-entry';
             
-            const time = document.createElement('span');
-            time.className = 'log-time';
-            time.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const time = new Date().toLocaleTimeString([], { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            });
             
-            const msg = document.createElement('span');
-            msg.className = `log-message ${type}`;
-            msg.textContent = message;
-            
-            entry.appendChild(time);
-            entry.appendChild(msg);
+            entry.innerHTML = `<span class="log-time">[${time}]</span>
+                               <span class="log-message ${type}">${message}</span>`;
             
             logBox.appendChild(entry);
             logBox.scrollTop = logBox.scrollHeight;
         }
         
         function clearLog() {
-            logBox.innerHTML = '';
+            document.getElementById('logBox').innerHTML = '';
             log('Registro limpiado.', 'info');
         }
-        
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
