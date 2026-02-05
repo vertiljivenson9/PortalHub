@@ -745,37 +745,42 @@
         
         // Step 1: Folder selection
         async function selectFolder() {
-            try {
-                const handle = await window.showDirectoryPicker();
-                state.selectedFolder = handle;
-                state.folderName = handle.name;
-                
-                log(`Carpeta seleccionada: "${handle.name}". Leyendo contenido...`, 'info');
-                
-                // Read all files recursively
-                state.files = [];
-                await readDirectory(handle, '');
-                
-                // Update UI
-                folderPath.textContent = handle.name;
-                fileCount.textContent = `${state.files.length} archivos encontrados`;
-                selectedFolder.style.display = 'block';
-                
-                // Update file list preview
-                updateFilePreview();
-                
-                // Enable next step button
-                nextStep1Button.disabled = false;
-                
-                log(`Estructura cargada correctamente. ${state.files.length} archivos listos.`, 'success');
-            } catch (error) {
-                if (error.name === 'AbortError') {
-                    log('Selección de carpeta cancelada.', 'info');
-                } else {
-                    log(`Error al seleccionar carpeta: ${error.message}`, 'error');
-                }
-            }
-        }
+  // Reiniciar el estado
+  files = [];
+  folderPath.textContent = '';
+  fileCount.textContent = '';
+  selectedFolder.style.display = 'none';
+  filesPreview.style.display = 'none';
+  filesList.innerHTML = '';
+
+  try {
+    log('Solicitando permiso para acceder a una carpeta...', 'info');
+    
+    // 1. Llamada clave a la API del navegador
+    const directoryHandle = await window.showDirectoryPicker();
+    state.folderName = directoryHandle.name;
+    log(`Carpeta seleccionada: "${directoryHandle.name}". Leyendo contenido...`, 'info');
+
+    // 2. Leer todos los archivos recursivamente
+    await readDirectory(directoryHandle, '');
+    log(`Estructura cargada correctamente. ${state.files.length} archivos listos.`, 'success');
+
+    // 3. Actualizar la interfaz de usuario
+    folderPath.textContent = state.folderName;
+    fileCount.textContent = `${state.files.length} archivos encontrados`;
+    selectedFolder.style.display = 'block';
+    updateFilePreview(); // Esta función debe existir para mostrar la vista previa
+    validate(); // Para habilitar el botón de despliegue
+
+  } catch (error) {
+    // Manejo específico de errores
+    if (error.name === 'AbortError') {
+      log('Selección de carpeta cancelada por el usuario.', 'info');
+    } else {
+      log(`Error al acceder a la carpeta: ${error.message}`, 'error');
+    }
+  }
+}
         
         async function readDirectory(directoryHandle, path) {
             for await (const entry of directoryHandle.values()) {
