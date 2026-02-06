@@ -1648,139 +1648,116 @@ package.json"></textarea>
         }
         
         // CORREGIDO: Crear árbol con la estructura portalHub (FUNCIÓN CORREGIDA)
-       // CORREGIDO: Crear árbol con la estructura portalHub (FUNCIÓN CORREGIDA)
+    // CORREGIDO: Crear árbol con la estructura portalHub - VERSIÓN DEFINITIVA
 async function createPortalHubTree(baseTreeSha) {
     try {
-        // Construir árbol GitHub a partir de nuestra estructura
-        const treeItems = [];
+        // PASO 1: Recolectar SOLO archivos (nunca carpetas)
+        const files = [];
         
-        // Función recursiva para agregar elementos al árbol
-        // ✅ REGLA: Solo archivos (blob), nunca carpetas (tree)
-        function addToTree(items, basePath = 'portalHub') {
+        function collectFiles(items, currentPath = '') {
             items.forEach(item => {
-                const itemPath = basePath ? `${basePath}/${item.name}` : item.name;
+                // Normalizar nombre (eliminar espacios invisibles)
+                const cleanName = item.name.trim();
                 
                 if (item.type === 'folder') {
-                    // ❌ NO agregar carpetas al árbol - Git las crea automáticamente por la ruta
-                    // Solo procesar hijos recursivamente
+                    // NO agregar carpetas al array - solo procesar hijos
+                    const newPath = currentPath ? `${currentPath}/${cleanName}` : cleanName;
+                    
                     if (item.children && item.children.length > 0) {
-                        addToTree(item.children, itemPath);
+                        collectFiles(item.children, newPath);
                     }
                 } else {
-                    // ✅ SOLO archivos: usar SOLO 'content', NUNCA 'sha'
-                    treeItems.push({
-                        path: itemPath,
-                        mode: '100644',
-                        type: 'blob',
-                        content: ''  // Archivo vacío
+                    // ES UN ARCHIVO: agregar a la lista
+                    const filePath = currentPath ? `${currentPath}/${cleanName}` : cleanName;
+                    files.push({
+                        path: filePath,
+                        name: cleanName,
+                        originalItem: item
                     });
                 }
             });
         }
         
-        // Construir el array de elementos del árbol
-        addToTree(folderStructure);
+        collectFiles(folderStructure);
         
-        // Validación: asegurar que hay elementos
-        if (treeItems.length === 0) {
-            throw new Error('No hay archivos para crear en el árbol. La estructura está vacía.');
+        // PASO 2: Validar que hay archivos
+        if (files.length === 0) {
+            throw new Error('No se encontraron archivos. La estructura está vacía o solo contiene carpetas.');
         }
         
-        // ✅ DEBUG: Ver exactamente qué se va a enviar
-        console.log('=== PAYLOAD A ENVIAR A GITHUB ===');
-        console.log(JSON.stringify({
-            tree: treeItems,
-            base_tree: baseTreeSha
-        }, null, 2));
-        console.log('=================================');
+        logToConsole(`Recolectados ${files.length} archivos para crear`, 'info');
         
-        logToConsole(`Creando árbol con ${treeItems.length} archivos...`, 'info');
-        
-        // Enviar solicitud a la API de GitHub
-        const treeResponse = await fetch(`https://api.github.com/repos/${githubOwner}/${githubRepo}/git/trees`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `token ${githubToken}`,
-                'Accept': 'application/vnd.github+json',
-                'Content-Type': 'application/json',
-                'X-GitHub-Api-Version': '2022-11-28'
-            },
-            body: JSON.stringify({
-                tree: treeItems,
-                base_tree: baseTreeSha
-            })
+        // PASO 3: Normalizar paths y construir entradas del árbol Git
+        const treeItems = files.map(file => {
+            // Normalizar path
+            let normalizedPath = file.path
+                .replace(/\\/g, '/')           // Backslash a forward slash
+                .replace(/\/+/g, '/')          // Colapsar múltiples slashes
+                .replace(/^\/+/, '')           // Eliminar slash inicial
+                .replace(/\/+$/, '');          // Eliminar slash final
+            
+            // Prefijo obligatorio portalHub/
+            const finalPath = `portalHub/${normalizedPath}`;
+            
+            // Contenido: NUNCA vacío (GitHub rechaza blobs vacíos)
+            let content = '';
+            if (file.originalItem && file.originalItem.content) {
+                content = file.originalItem.content;
+            }
+            // Si está vacío o solo tiene espacios, poner newline
+            if (!content || content.trim() === '') {
+                content = '\n';
+            }
+            
+            return {
+                path: finalPath,
+                mode: '100644',
+                type: 'blob',
+                content: content
+            };
         });
         
-        if (!treeResponse.ok) {
-            const errorText = await treeResponse.text();
-            logToConsole(`Respuesta de API: ${treeResponse.status} - ${errorText}`, 'error');
-            throw new Error(`Error creando árbol: ${treeResponse.status} - ${errorText}`);
+        // PASO 4: Validación estricta antes de enviar
+        for (let i = 0; i < treeItems.length; i++) {
+            const entry = treeItems[i];
+            
+            // Validar type
+            if (entry.type !== 'blob') {
+                throw new Error(`Entrada ${i}: type debe ser "blob", encontrado "${entry.type}"`);
+            }
+            
+            // Validar que no es carpeta (path termina en /)
+            if (entry.path.endsWith('/')) {
+                throw new Error(`Entrada ${i}: path termina en "/", es una carpeta: ${entry.path}`);
+            }
+            
+            // Validar content existe
+            if (entry.content === undefined || entry.content === null) {
+                throw new Error(`Entrada ${i}: content es undefined/null`);
+            }
+            
+            // Validar que no tiene sha (conflicto con content)
+            if (entry.sha) {
+                throw new Error(`Entrada ${i}: tiene sha, no puede usarse con content`);
+            }
+            
+            // Validar path no vacío
+            if (!entry.path || entry.path.trim() === '') {
+                throw new Error(`Entrada ${i}: path está vacío`);
+            }
         }
         
-        const treeData = await treeResponse.json();
-        logToMessage(`✅ Árbol creado exitosamente. SHA: ${treeData.sha.substring(0, 8)}`, 'success');
-        return treeData.sha;
-        
-    } catch (error) {
-        throw new Error(`Error en createPortalHubTree: ${error.message}`);
-    }
-}
-        
-        // Crear commit
-        async function createPortalHubTree(baseTreeSha) {
-    try {
-        const treeItems = [];
-        
-        // Función recursiva para agregar SOLO archivos (no carpetas)
-        function addFilesToTree(items, basePath = 'portalHub') {
-            items.forEach(item => {
-                const itemPath = basePath ? `${basePath}/${item.name}` : item.name;
-                
-                if (item.type === 'folder') {
-                    // ❌ NO agregar carpetas al árbol - Git las crea automáticamente
-                    // Solo procesar hijos recursivamente
-                    if (item.children && item.children.length > 0) {
-                        addFilesToTree(item.children, itemPath);
-                    }
-                } else {
-                    // ✅ SOLO archivos: usar SOLO 'content', NUNCA 'sha'
-                    treeItems.push({
-                        path: itemPath,
-                        mode: '100644',
-                        type: 'blob',
-                        content: '' // Archivo vacío
-                    });
-                }
-            });
-        }
-        
-        addFilesToTree(folderStructure);
-        
-        // Validación: asegurar que hay elementos
-        if (treeItems.length === 0) {
-            throw new Error('No hay archivos para crear en el árbol');
-        }
-        
-        // Validación: verificar que ninguna entrada tenga sha o esté incompleta
-        const invalidItems = treeItems.filter(item => 
-            !item.path || 
-            item.sha || // ❌ No debe tener sha
-            !item.content // Debe tener content (aunque sea vacío)
-        );
-        
-        if (invalidItems.length > 0) {
-            console.error('Items inválidos:', invalidItems);
-            throw new Error(`Hay ${invalidItems.length} entradas inválidas en el árbol`);
-        }
-        
-        logToConsole(`Creando árbol con ${treeItems.length} archivos...`, 'info');
-        
-        // Debug: mostrar exactamente qué se envía
-        console.log('Payload enviado a GitHub:', JSON.stringify({
-            tree: treeItems,
-            base_tree: baseTreeSha
+        // PASO 5: Debug - mostrar payload exacto
+        console.log('=== PAYLOAD GITHUB API ===');
+        console.log(JSON.stringify({
+            base_tree: baseTreeSha,
+            tree: treeItems
         }, null, 2));
+        console.log('==========================');
         
+        logToConsole(`Enviando ${treeItems.length} entradas a GitHub...`, 'info');
+        
+        // PASO 6: Enviar a GitHub
         const treeResponse = await fetch(
             `https://api.github.com/repos/${githubOwner}/${githubRepo}/git/trees`, 
             {
@@ -1792,25 +1769,27 @@ async function createPortalHubTree(baseTreeSha) {
                     'X-GitHub-Api-Version': '2022-11-28'
                 },
                 body: JSON.stringify({
-                    tree: treeItems,
-                    base_tree: baseTreeSha
+                    base_tree: baseTreeSha,
+                    tree: treeItems
                 })
             }
         );
         
         if (!treeResponse.ok) {
             const errorText = await treeResponse.text();
-            logToConsole(`Error API GitHub: ${treeResponse.status}`, 'error');
+            logToConsole(`Error GitHub API: ${treeResponse.status}`, 'error');
             logToConsole(`Respuesta: ${errorText}`, 'error');
-            throw new Error(`Error ${treeResponse.status}: ${errorText}`);
+            throw new Error(`GitHub API error ${treeResponse.status}: ${errorText}`);
         }
         
         const treeData = await treeResponse.json();
-        logToConsole(`Árbol creado: ${treeData.sha.substring(0, 8)}`, 'success');
+        logToConsole(`Árbol creado exitosamente: ${treeData.sha.substring(0, 8)}`, 'success');
+        
         return treeData.sha;
         
     } catch (error) {
-        throw new Error(`Error en createPortalHubTree: ${error.message}`);
+        logToConsole(`Error en createPortalHubTree: ${error.message}`, 'error');
+        throw error;
     }
 }
         
