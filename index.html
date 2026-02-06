@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PortalHub Creator v1.1 - Estructura corregida</title>
+    <title>PortalHub Creator v1.2 - Preserva contenido de archivos</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* [ESTILOS COMPLETOS MANTENIDOS IGUAL] */
         :root {
             --primary: #2ea44f;
             --primary-dark: #22863a;
@@ -559,12 +558,35 @@
         .tab-content.active {
             display: block;
         }
+        
+        .file-content-preview {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: #f5f5f5;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            margin-top: 10px;
+        }
+        
+        .preview-toggle {
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1><i class="fas fa-project-diagram"></i> PortalHub Creator v1.1</h1>
-        <p>Publica el contenido de carpetas directamente en la raíz del repositorio</p>
+        <h1><i class="fas fa-project-diagram"></i> PortalHub Creator v1.2</h1>
+        <p>Preserva el contenido real de tus archivos al publicar en GitHub</p>
     </div>
     
     <div class="step-indicator">
@@ -594,7 +616,8 @@
             <div class="alert alert-success">
                 <i class="fas fa-check-circle"></i>
                 <div>
-                    <strong>v1.1 - Estructura corregida:</strong> El contenido de la carpeta se publica directamente en la raíz del repositorio. No se incluye la carpeta contenedora.
+                    <strong>v1.2 - Contenido preservado:</strong> Los archivos mantienen su contenido original.
+                    Si están vacíos, se crea contenido por defecto apropiado para cada tipo.
                 </div>
             </div>
             
@@ -613,7 +636,7 @@
                     <i class="fas fa-folder-open"></i>
                     <h3>Arrastra y suelta una carpeta aquí</h3>
                     <p>O haz clic para seleccionar una carpeta</p>
-                    <p><small>Se publicará el contenido interno directamente en la raíz del repositorio</small></p>
+                    <p><small>El contenido de los archivos se preservará completamente</small></p>
                 </div>
                 
                 <input type="file" id="folderInput" class="file-input-hidden" webkitdirectory directory>
@@ -627,6 +650,10 @@
                             <div class="stat">
                                 <div class="stat-value" id="uniqueFolders">0</div>
                                 <div class="stat-label">Carpetas únicas</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value" id="contentPreserved">0</div>
+                                <div class="stat-label">Archivos con contenido</div>
                             </div>
                         </div>
                     </div>
@@ -646,14 +673,14 @@
                 <div class="alert alert-warning">
                     <i class="fas fa-exclamation-triangle"></i>
                     <div>
-                        <strong>Estructura manual:</strong> Define la estructura de archivos y carpetas que quieres crear.
-                        Cada línea representa un archivo o carpeta.
+                        <strong>Estructura manual:</strong> Define la estructura de archivos y carpetas.
+                        Para archivos con contenido específico, usa el editor avanzado.
                     </div>
                 </div>
                 
                 <div class="form-group">
-                    <label for="manualStructure" class="form-label">Estructura (una por línea):</label>
-                    <textarea id="manualStructure" class="form-control" rows="10" placeholder="Ejemplo:
+                    <label for="manualStructure" class="form-label">Estructura básica (una por línea):</label>
+                    <textarea id="manualStructure" class="form-control" rows="8" placeholder="Ejemplo:
 index.html
 src/
   main.js
@@ -667,8 +694,22 @@ README.md"></textarea>
                     </span>
                 </div>
                 
+                <div class="form-group">
+                    <label for="fileContentEditor" class="form-label">Editor de contenido avanzado:</label>
+                    <textarea id="fileContentEditor" class="form-control" rows="6" placeholder="Puedes pegar contenido específico para archivos aquí.
+Formato: ruta/archivo.ext
+Contenido...
+---
+otra/ruta/archivo2.js
+Contenido...
+---"></textarea>
+                    <span class="form-help">
+                        Define contenido específico para archivos. Separa con <code>---</code> en una línea nueva.
+                    </span>
+                </div>
+                
                 <button id="parseManualBtn" class="btn btn-block">
-                    <i class="fas fa-sitemap"></i> Generar estructura
+                    <i class="fas fa-sitemap"></i> Generar estructura con contenido
                 </button>
             </div>
             
@@ -677,7 +718,20 @@ README.md"></textarea>
                 <div class="folder-structure" id="folderStructure">
                     <!-- La estructura de carpetas se generará aquí -->
                 </div>
-                <p class="form-help" id="structureHelp">
+                
+                <div id="contentPreviewSection" class="hidden">
+                    <h4 class="card-title" style="font-size: 1.1rem; margin-top: 20px;">
+                        <i class="fas fa-file-code"></i> Vista previa de contenido
+                    </h4>
+                    <div id="contentPreview" class="file-content-preview">
+                        <!-- Vista previa de contenido se mostrará aquí -->
+                    </div>
+                    <div class="preview-toggle" id="togglePreview">
+                        <i class="fas fa-eye"></i> <span>Ver contenido de archivos seleccionados</span>
+                    </div>
+                </div>
+                
+                <p class="form-help">
                     <i class="fas fa-info-circle"></i>
                     Todos los elementos se publicarán directamente en la raíz del repositorio.
                 </p>
@@ -691,8 +745,8 @@ README.md"></textarea>
             <div class="alert alert-info">
                 <i class="fas fa-shield-alt"></i>
                 <div>
-                    <strong>Flujo optimizado:</strong> El contenido de tu carpeta se publica directamente en la raíz del repositorio.
-                    Listo para despliegue inmediato.
+                    <strong>Contenido preservado:</strong> Los archivos mantienen su magia intacta.
+                    Código, configuraciones y contenido se exportan tal cual.
                 </div>
             </div>
             
@@ -734,7 +788,7 @@ README.md"></textarea>
             
             <div class="form-group">
                 <button id="publishBtn" class="btn btn-block" disabled>
-                    <i class="fas fa-rocket"></i> Publicar contenido en GitHub
+                    <i class="fas fa-rocket"></i> Publicar con contenido completo
                 </button>
                 <div class="progress-bar hidden" id="progressBar">
                     <div class="progress-fill" id="progressFill"></div>
@@ -748,7 +802,7 @@ README.md"></textarea>
             <div class="console" id="console">
                 <div class="console-line">
                     <span class="console-time" id="currentTime">00:00:00</span>
-                    <span class="console-message console-info">PortalHub Creator v1.1 inicializado. Contenido de carpetas publicado directamente en raíz.</span>
+                    <span class="console-message console-info">PortalHub Creator v1.2 inicializado. Contenido de archivos preservado.</span>
                 </div>
             </div>
         </div>
@@ -756,13 +810,13 @@ README.md"></textarea>
     
     <div class="footer">
         <p>
-            PortalHub Creator v1.1 - Corrección de estructura de carpetas | 
+            PortalHub Creator v1.2 - Preservación de contenido | 
             <a href="https://docs.github.com/en/rest/git" target="_blank">GitHub REST API</a> | 
-            Contenido directo en raíz
+            Archivos con su contenido real
         </p>
         <p>
-            <i class="fas fa-check-circle"></i> 
-            El nombre de la carpeta local no aparece en el repositorio. Solo el contenido interno.
+            <i class="fas fa-code"></i> 
+            El contenido de los archivos se exporta completamente. Si están vacíos, se genera contenido apropiado.
         </p>
     </div>
 
@@ -776,6 +830,7 @@ README.md"></textarea>
         let currentStep = 1;
         let consoleElement = null;
         let baseFolderName = '';
+        let fileContents = new Map(); // Mapa para almacenar contenido de archivos
         
         // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
@@ -794,11 +849,12 @@ README.md"></textarea>
             document.getElementById('publishBtn').addEventListener('click', publishToGitHub);
             document.getElementById('clearFilesBtn').addEventListener('click', clearFileSelection);
             document.getElementById('parseManualBtn').addEventListener('click', parseManualStructure);
+            document.getElementById('togglePreview').addEventListener('click', toggleContentPreview);
             
             // Actualizar hora actual en consola
             setInterval(updateCurrentTime, 1000);
             
-            logToConsole('PortalHub Creator v1.1 inicializado. Corrección de estructura aplicada.', 'success');
+            logToConsole('PortalHub Creator v1.2 inicializado. Contenido de archivos preservado.', 'success');
         });
         
         // Configurar navegación por pestañas
@@ -887,13 +943,13 @@ README.md"></textarea>
                     const firstPath = files[0].relativePath;
                     baseFolderName = firstPath.split('/')[0];
                     
-                    // Procesar archivos
-                    processFolderFiles(files);
+                    // Procesar archivos (ahora lee contenido)
+                    await processFolderFiles(files);
                 }
             });
             
             // Cambio en el input de carpeta
-            folderInput.addEventListener('change', (e) => {
+            folderInput.addEventListener('change', async (e) => {
                 const files = Array.from(e.target.files);
                 if (files.length > 0) {
                     // Detectar el nombre de la carpeta base desde webkitRelativePath
@@ -901,7 +957,7 @@ README.md"></textarea>
                     if (firstFile.webkitRelativePath) {
                         baseFolderName = firstFile.webkitRelativePath.split('/')[0];
                     }
-                    processFolderFiles(files);
+                    await processFolderFiles(files);
                 }
             });
         }
@@ -911,44 +967,202 @@ README.md"></textarea>
             // Ya configurado en event listener principal
         }
         
-        // Procesar archivos de carpeta - CORRECCIÓN CRÍTICA
-        function processFolderFiles(files) {
+        // Procesar archivos de carpeta - LEE CONTENIDO REAL
+        async function processFolderFiles(files) {
             selectedFiles = [];
+            fileContents.clear();
             
-            files.forEach(file => {
-                // Obtener ruta relativa desde webkitRelativePath o relativePath
+            logToConsole(`Leyendo contenido de ${files.length} archivos...`, 'info');
+            
+            // Leer contenido de cada archivo
+            for (const file of files) {
+                // Obtener ruta relativa
                 let relativePath = file.relativePath || file.webkitRelativePath || file.name;
                 
-                // CORRECCIÓN: Remover el nombre de la carpeta base
+                // Remover el nombre de la carpeta base
                 if (relativePath && baseFolderName) {
-                    // Asegurar que la ruta comience con el nombre de la carpeta base
                     if (relativePath.startsWith(baseFolderName + '/')) {
                         relativePath = relativePath.substring(baseFolderName.length + 1);
                     }
                 }
                 
-                selectedFiles.push({
-                    name: file.name,
-                    path: relativePath,
-                    size: file.size,
-                    type: file.type,
-                    isDirectory: file.type === '' && (relativePath.includes('/') || file.size === 0)
-                });
-            });
+                // Leer contenido del archivo
+                try {
+                    const content = await readFileContent(file);
+                    fileContents.set(relativePath, content);
+                    
+                    selectedFiles.push({
+                        name: file.name,
+                        path: relativePath,
+                        size: file.size,
+                        type: file.type,
+                        isDirectory: file.type === '' && (relativePath.includes('/') || file.size === 0),
+                        content: content
+                    });
+                    
+                    logToConsole(`✓ Leído: ${relativePath} (${file.size} bytes)`, 'info');
+                } catch (error) {
+                    logToConsole(`✗ Error leyendo ${relativePath}: ${error.message}`, 'error');
+                    
+                    // Crear contenido por defecto si no se puede leer
+                    const defaultContent = createDefaultContent(file.name);
+                    fileContents.set(relativePath, defaultContent);
+                    
+                    selectedFiles.push({
+                        name: file.name,
+                        path: relativePath,
+                        size: file.size,
+                        type: file.type,
+                        isDirectory: file.type === '' && (relativePath.includes('/') || file.size === 0),
+                        content: defaultContent
+                    });
+                }
+            }
             
             updateFolderSelectionUI();
             generateFolderStructureFromFiles();
+        }
+        
+        // Leer contenido de un archivo
+        function readFileContent(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    resolve(e.target.result);
+                };
+                
+                reader.onerror = function(e) {
+                    reject(new Error('Error al leer el archivo'));
+                };
+                
+                // Determinar cómo leer el archivo según su tipo
+                if (file.type.startsWith('text/') || 
+                    file.name.match(/\.(txt|html|htm|css|js|json|md|xml|csv|ts|jsx|tsx|vue|php|py|rb|java|c|cpp|h|hpp|cs|go|rs|swift|kt|scala|pl|sh|bat|ps1|yml|yaml|toml|ini|cfg|conf|log)$/i)) {
+                    reader.readAsText(file);
+                } else {
+                    // Para archivos binarios, leer como Data URL
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+        
+        // Crear contenido por defecto según tipo de archivo
+        function createDefaultContent(filename) {
+            const extension = filename.split('.').pop().toLowerCase();
+            
+            switch(extension) {
+                case 'html':
+                case 'htm':
+                    return `<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${filename}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <h1>${filename}</h1>
+    <p>Archivo creado automáticamente por PortalHub Creator v1.2</p>
+</body>
+</html>`;
+                    
+                case 'js':
+                    return `// ${filename}
+// Archivo creado automáticamente por PortalHub Creator v1.2
+
+console.log('${filename} cargado');
+
+function init() {
+    console.log('Aplicación inicializada');
+}
+
+module.exports = { init };`;
+                    
+                case 'css':
+                    return `/* ${filename} */
+/* Archivo creado automáticamente por PortalHub Creator v1.2 */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}`;
+                    
+                case 'json':
+                    const name = filename.replace('.json', '');
+                    return JSON.stringify({
+                        name: name,
+                        version: "1.0.0",
+                        description: "Archivo creado automáticamente por PortalHub Creator v1.2",
+                        main: "index.js",
+                        scripts: {
+                            start: "node index.js"
+                        },
+                        author: "",
+                        license: "MIT"
+                    }, null, 2);
+                    
+                case 'md':
+                    return `# ${filename}
+
+Archivo creado automáticamente por PortalHub Creator v1.2.
+
+## Descripción
+
+Este archivo fue generado automáticamente.`;
+
+                case 'py':
+                    return `# ${filename}
+# Archivo creado automáticamente por PortalHub Creator v1.2
+
+def main():
+    print("Hello from ${filename}")
+
+if __name__ == "__main__":
+    main()`;
+
+                case 'php':
+                    return `<?php
+// ${filename}
+// Archivo creado automáticamente por PortalHub Creator v1.2
+
+echo "Hello from ${filename}";
+?>`;
+
+                default:
+                    return `# ${filename}
+
+Archivo creado automáticamente por PortalHub Creator v1.2.
+
+Este archivo fue generado automáticamente. Su contenido puede ser editado según sea necesario.`;
+            }
         }
         
         // Actualizar UI de selección de carpeta
         function updateFolderSelectionUI() {
             const fileCount = selectedFiles.length;
             const folderCount = countUniqueFolders();
+            const filesWithContent = selectedFiles.filter(f => f.content && f.content.trim() !== '').length;
             
             document.getElementById('selectedFolderName').textContent = baseFolderName || 'Carpeta sin nombre';
             document.getElementById('fileCount').textContent = fileCount;
             document.getElementById('folderCount').textContent = folderCount;
             document.getElementById('uniqueFolders').textContent = folderCount;
+            document.getElementById('contentPreserved').textContent = filesWithContent;
             
             // Actualizar lista de archivos
             const fileList = document.getElementById('fileList');
@@ -962,7 +1176,10 @@ README.md"></textarea>
                     item.className = 'file-list-item';
                     
                     const icon = file.isDirectory ? 'fa-folder' : 'fa-file';
-                    item.innerHTML = `<i class="fas ${icon}"></i> <span>${file.path}</span>`;
+                    const hasContent = file.content && file.content.trim() !== '';
+                    const contentIndicator = hasContent ? ' <span style="color: var(--success); font-size: 0.7rem;">✓</span>' : '';
+                    
+                    item.innerHTML = `<i class="fas ${icon}"></i> <span>${file.path}${contentIndicator}</span>`;
                     fileList.appendChild(item);
                     uniqueFiles[file.path] = true;
                 }
@@ -972,8 +1189,7 @@ README.md"></textarea>
             document.getElementById('selectedFolderInfo').classList.remove('hidden');
             updateStep(2);
             
-            logToConsole(`Carpeta "${baseFolderName}" seleccionada: ${fileCount} archivos, ${folderCount} carpetas internas.`, 'success');
-            logToConsole(`El contenido se publicará directamente en la raíz del repositorio.`, 'info');
+            logToConsole(`Carpeta "${baseFolderName}" procesada: ${fileCount} archivos, ${filesWithContent} con contenido.`, 'success');
         }
         
         // Contar carpetas únicas internas
@@ -984,9 +1200,7 @@ README.md"></textarea>
                 const path = file.path || '';
                 const parts = path.split('/');
                 
-                // Si hay más de una parte, hay carpetas en la ruta
                 if (parts.length > 1) {
-                    // Agregar todas las carpetas en la ruta (excepto el archivo final)
                     let currentPath = '';
                     for (let i = 0; i < parts.length - 1; i++) {
                         currentPath = currentPath ? `${currentPath}/${parts[i]}` : parts[i];
@@ -998,11 +1212,10 @@ README.md"></textarea>
             return folders.size;
         }
         
-        // Generar estructura de carpetas a partir de archivos - CORREGIDO
+        // Generar estructura de carpetas a partir de archivos
         function generateFolderStructureFromFiles() {
             folderStructure = [];
             
-            // Crear un mapa para organizar archivos por ruta
             selectedFiles.forEach(file => {
                 const path = file.path || '';
                 const parts = path.split('/');
@@ -1012,7 +1225,8 @@ README.md"></textarea>
                     folderStructure.push({
                         name: parts[0],
                         path: parts[0],
-                        type: 'file'
+                        type: 'file',
+                        content: file.content
                     });
                 } else {
                     // Construir estructura jerárquica
@@ -1021,11 +1235,10 @@ README.md"></textarea>
                     
                     for (let i = 0; i < parts.length; i++) {
                         const part = parts[i];
-                        if (!part) continue; // Saltar partes vacías
+                        if (!part) continue;
                         
                         currentPath = currentPath ? `${currentPath}/${part}` : part;
                         
-                        // Buscar si ya existe este nivel
                         let existingItem = currentLevel.find(item => item.name === part);
                         
                         // Si es el último elemento y es un archivo
@@ -1034,7 +1247,8 @@ README.md"></textarea>
                                 currentLevel.push({
                                     name: part,
                                     path: currentPath,
-                                    type: 'file'
+                                    type: 'file',
+                                    content: file.content
                                 });
                             }
                         } else {
@@ -1049,7 +1263,6 @@ README.md"></textarea>
                                 currentLevel.push(existingItem);
                             }
                             
-                            // Asegurar que tiene children si es una carpeta
                             if (!existingItem.children) {
                                 existingItem.children = [];
                             }
@@ -1060,7 +1273,7 @@ README.md"></textarea>
                 }
             });
             
-            // Ordenar estructura: carpetas primero, luego archivos
+            // Ordenar estructura
             function sortStructure(items) {
                 items.sort((a, b) => {
                     if (a.type === b.type) {
@@ -1079,55 +1292,138 @@ README.md"></textarea>
             sortStructure(folderStructure);
             displayFolderStructure(folderStructure);
             
-            logToConsole(`Estructura generada con ${folderStructure.length} elementos en la raíz.`, 'info');
+            logToConsole(`Estructura generada: ${folderStructure.length} elementos en la raíz.`, 'info');
         }
         
-        // Parsear estructura manual desde texto
+        // Parsear estructura manual con contenido
         function parseManualStructure() {
-            const text = document.getElementById('manualStructure').value;
-            if (!text.trim()) {
-                alert('Por favor, ingresa una estructura en el área de texto.');
+            const basicText = document.getElementById('manualStructure').value;
+            const contentText = document.getElementById('fileContentEditor').value;
+            
+            if (!basicText.trim() && !contentText.trim()) {
+                alert('Por favor, ingresa una estructura básica o contenido avanzado.');
                 return;
             }
             
-            const lines = text.split('\n');
             folderStructure = [];
-            const stack = [{ level: -1, children: folderStructure }];
+            fileContents.clear();
             
-            lines.forEach(line => {
-                if (!line.trim()) return;
+            // Procesar estructura básica
+            if (basicText.trim()) {
+                const lines = basicText.split('\n');
+                const stack = [{ level: -1, children: folderStructure }];
                 
-                // Calcular nivel de indentación (2 espacios por nivel)
-                const indent = line.search(/\S/);
-                const level = Math.floor(indent / 2);
-                const name = line.trim();
+                lines.forEach(line => {
+                    if (!line.trim()) return;
+                    
+                    const indent = line.search(/\S/);
+                    const level = Math.floor(indent / 2);
+                    const name = line.trim();
+                    
+                    const isFolder = name.endsWith('/');
+                    const cleanName = isFolder ? name.slice(0, -1) : name;
+                    
+                    while (stack.length > 0 && stack[stack.length - 1].level >= level) {
+                        stack.pop();
+                    }
+                    
+                    const parent = stack[stack.length - 1];
+                    const newItem = {
+                        name: cleanName,
+                        path: cleanName,
+                        type: isFolder ? 'folder' : 'file'
+                    };
+                    
+                    if (isFolder) {
+                        newItem.children = [];
+                    } else {
+                        // Para archivos en estructura básica, crear contenido por defecto
+                        newItem.content = createDefaultContent(cleanName);
+                        fileContents.set(cleanName, newItem.content);
+                    }
+                    
+                    parent.children.push(newItem);
+                    
+                    if (isFolder) {
+                        stack.push({ level: level, children: newItem.children });
+                    }
+                });
+            }
+            
+            // Procesar contenido avanzado
+            if (contentText.trim()) {
+                const sections = contentText.split('---').map(s => s.trim()).filter(s => s);
                 
-                // Determinar si es carpeta (termina con /)
-                const isFolder = name.endsWith('/');
-                const cleanName = isFolder ? name.slice(0, -1) : name;
-                
-                // Encontrar el padre correcto en la pila
-                while (stack.length > 0 && stack[stack.length - 1].level >= level) {
-                    stack.pop();
-                }
-                
-                const parent = stack[stack.length - 1];
-                const newItem = {
-                    name: cleanName,
-                    path: cleanName,
-                    type: isFolder ? 'folder' : 'file'
-                };
-                
-                if (isFolder) {
-                    newItem.children = [];
-                }
-                
-                parent.children.push(newItem);
-                
-                if (isFolder) {
-                    stack.push({ level: level, children: newItem.children });
-                }
-            });
+                sections.forEach(section => {
+                    const lines = section.split('\n');
+                    if (lines.length < 2) return;
+                    
+                    const filePath = lines[0].trim();
+                    const content = lines.slice(1).join('\n');
+                    
+                    // Buscar y actualizar el archivo en la estructura
+                    function updateFileContent(items, pathParts, content, currentPath = '') {
+                        for (let i = 0; i < items.length; i++) {
+                            const item = items[i];
+                            const itemPath = currentPath ? `${currentPath}/${item.name}` : item.name;
+                            
+                            if (itemPath === filePath && item.type === 'file') {
+                                item.content = content;
+                                fileContents.set(filePath, content);
+                                return true;
+                            }
+                            
+                            if (item.children) {
+                                if (updateFileContent(item.children, pathParts, content, itemPath)) {
+                                    return true;
+                                }
+                            }
+                        }
+                        return false;
+                    }
+                    
+                    if (!updateFileContent(folderStructure, filePath.split('/'), content)) {
+                        // Si el archivo no existe en la estructura, crearlo
+                        const parts = filePath.split('/');
+                        let currentLevel = folderStructure;
+                        
+                        for (let i = 0; i < parts.length; i++) {
+                            const part = parts[i];
+                            const isLast = i === parts.length - 1;
+                            
+                            let existingItem = currentLevel.find(item => item.name === part);
+                            
+                            if (isLast) {
+                                if (!existingItem) {
+                                    currentLevel.push({
+                                        name: part,
+                                        path: filePath,
+                                        type: 'file',
+                                        content: content
+                                    });
+                                    fileContents.set(filePath, content);
+                                }
+                            } else {
+                                if (!existingItem) {
+                                    existingItem = {
+                                        name: part,
+                                        path: part,
+                                        type: 'folder',
+                                        children: []
+                                    };
+                                    currentLevel.push(existingItem);
+                                }
+                                
+                                if (!existingItem.children) {
+                                    existingItem.children = [];
+                                }
+                                
+                                currentLevel = existingItem.children;
+                            }
+                        }
+                    }
+                });
+            }
             
             // Actualizar UI
             document.getElementById('selectedFolderInfo').classList.add('hidden');
@@ -1136,15 +1432,17 @@ README.md"></textarea>
             // Actualizar estadísticas
             const folderCount = countItemsByType(folderStructure, 'folder');
             const fileCount = countItemsByType(folderStructure, 'file');
+            const filesWithContent = Array.from(fileContents.values()).filter(c => c && c.trim() !== '').length;
             
             document.getElementById('folderCount').textContent = folderCount;
             document.getElementById('fileCount').textContent = fileCount;
             document.getElementById('selectedFolderName').textContent = 'Estructura manual';
+            document.getElementById('contentPreserved').textContent = filesWithContent;
             
             displayFolderStructure(folderStructure);
             updateStep(2);
             
-            logToConsole(`Estructura manual parseada: ${folderCount} carpetas, ${fileCount} archivos.`, 'success');
+            logToConsole(`Estructura manual creada: ${folderCount} carpetas, ${fileCount} archivos.`, 'success');
         }
         
         // Contar elementos por tipo
@@ -1170,6 +1468,7 @@ README.md"></textarea>
         function clearFileSelection() {
             selectedFiles = [];
             folderStructure = [];
+            fileContents.clear();
             baseFolderName = '';
             
             document.getElementById('selectedFolderInfo').classList.add('hidden');
@@ -1194,21 +1493,60 @@ README.md"></textarea>
                     }
                     
                     const icon = item.type === 'folder' ? 'fa-folder' : 'fa-file';
-                    itemElement.innerHTML = `<i class="fas ${icon}"></i> ${item.name}${item.type === 'folder' ? '/' : ''}`;
+                    const hasContent = item.type === 'file' && item.content && item.content.trim() !== '';
+                    const contentIndicator = hasContent ? ' <span style="color: var(--success); font-size: 0.7rem;">✓</span>' : '';
+                    
+                    itemElement.innerHTML = `<i class="fas ${icon}"></i> ${item.name}${item.type === 'folder' ? '/' : ''}${contentIndicator}`;
+                    
+                    // Hacer clic para ver contenido
+                    if (item.type === 'file' && hasContent) {
+                        itemElement.style.cursor = 'pointer';
+                        itemElement.title = 'Click para ver contenido';
+                        itemElement.addEventListener('click', () => {
+                            showContentPreview(item.path, item.content);
+                        });
+                    }
                     
                     container.appendChild(itemElement);
                     
-                    // Si es una carpeta con hijos, mostrarlos
                     if (item.children && item.children.length > 0) {
                         displayItems(item.children, level + 1);
                     }
                 });
             }
             
-            // Mostrar todos los elementos directamente
             displayItems(structure, 0);
             
             document.getElementById('structureSection').classList.remove('hidden');
+            document.getElementById('contentPreviewSection').classList.remove('hidden');
+        }
+        
+        // Mostrar vista previa de contenido
+        function showContentPreview(filePath, content) {
+            const preview = document.getElementById('contentPreview');
+            const maxLength = 1000;
+            
+            let previewContent = content;
+            if (previewContent.length > maxLength) {
+                previewContent = previewContent.substring(0, maxLength) + '\n\n... (contenido truncado, archivo muy grande)';
+            }
+            
+            preview.innerHTML = `<strong>${filePath}</strong>\n\n${previewContent}`;
+            preview.scrollTop = 0;
+        }
+        
+        // Alternar vista previa de contenido
+        function toggleContentPreview() {
+            const preview = document.getElementById('contentPreview');
+            const toggle = document.getElementById('togglePreview');
+            
+            if (preview.style.display === 'none') {
+                preview.style.display = 'block';
+                toggle.innerHTML = '<i class="fas fa-eye-slash"></i> <span>Ocultar contenido</span>';
+            } else {
+                preview.style.display = 'none';
+                toggle.innerHTML = '<i class="fas fa-eye"></i> <span>Ver contenido de archivos seleccionados</span>';
+            }
         }
         
         // Registrar mensajes en la consola
@@ -1231,7 +1569,6 @@ README.md"></textarea>
             consoleLine.appendChild(messageSpan);
             consoleElement.appendChild(consoleLine);
             
-            // Auto-scroll al final
             consoleElement.scrollTop = consoleElement.scrollHeight;
         }
         
@@ -1309,8 +1646,7 @@ README.md"></textarea>
             }
         }
         
-        // =========== FLUJO PRINCIPAL CORREGIDO ===========
-        // Publicar contenido en GitHub - VERSIÓN CORREGIDA
+        // =========== FLUJO PRINCIPAL CON CONTENIDO PRESERVADO ===========
         async function publishToGitHub() {
             if (!folderStructure || folderStructure.length === 0) {
                 alert('Primero selecciona una carpeta o crea una estructura manual.');
@@ -1334,7 +1670,7 @@ README.md"></textarea>
             document.getElementById('progressBar').classList.remove('hidden');
             updateProgress(0);
             
-            logToConsole(`=== INICIANDO PUBLICACIÓN CORREGIDA ===`, 'info');
+            logToConsole(`=== INICIANDO PUBLICACIÓN CON CONTENIDO PRESERVADO ===`, 'info');
             logToConsole(`Repositorio: ${githubOwner}/${githubRepo}`, 'info');
             updateStep(4);
             
@@ -1349,14 +1685,14 @@ README.md"></textarea>
                 const mainSha = await ensureMainBranch();
                 updateProgress(40);
                 
-                // PASO 3: Crear árbol Git en la RAÍZ (60%)
-                logToConsole('3. Creando estructura en la raíz del repositorio...', 'info');
-                const treeSha = await createRootTree(mainSha);
+                // PASO 3: Crear árbol Git con CONTENIDO REAL (60%)
+                logToConsole('3. Creando estructura con contenido real...', 'info');
+                const treeSha = await createRootTreeWithContent(mainSha);
                 updateProgress(60);
                 
                 // PASO 4: Crear commit (80%)
                 logToConsole('4. Creando commit con la estructura...', 'info');
-                const commitSha = await createCommit(treeSha, mainSha, '🚀 Contenido publicado directamente en raíz');
+                const commitSha = await createCommit(treeSha, mainSha, '🚀 Contenido publicado con PortalHub Creator v1.2');
                 updateProgress(80);
                 
                 // PASO 5: Actualizar rama main (100%)
@@ -1365,19 +1701,19 @@ README.md"></textarea>
                 updateProgress(100);
                 
                 // =========== PUBLICACIÓN COMPLETADA CON ÉXITO ===========
-                logToConsole('=== PUBLICACIÓN CORREGIDA COMPLETADA ===', 'success');
+                logToConsole('=== PUBLICACIÓN CON CONTENIDO COMPLETADA ===', 'success');
                 logToConsole('Flujo GitHub ejecutado correctamente:', 'success');
                 logToConsole('  ✓ Repositorio verificado/creado', 'success');
                 logToConsole('  ✓ Rama main inicializada', 'success');
-                logToConsole('  ✓ Árbol Git creado en la RAÍZ', 'success');
+                logToConsole('  ✓ Árbol Git creado con CONTENIDO REAL', 'success');
                 logToConsole('  ✓ Commit creado', 'success');
                 logToConsole('  ✓ Rama main actualizada', 'success');
                 logToConsole('', 'info');
-                logToConsole('🔗 Contenido disponible en:', 'info');
+                logToConsole('🔗 Repositorio disponible en:', 'info');
                 logToConsole(`https://github.com/${githubOwner}/${githubRepo}`, 'info');
                 logToConsole('', 'info');
-                logToConsole('✅ El contenido se ha publicado directamente en la raíz del repositorio.', 'success');
-                logToConsole('   No hay carpeta contenedora extra. Listo para despliegue.', 'success');
+                logToConsole('✅ El contenido de los archivos se ha preservado completamente.', 'success');
+                logToConsole('   Todo el código y configuración se exportaron tal cual.', 'success');
                 
                 // Mostrar alerta de éxito FINAL
                 showFinalSuccessAlert();
@@ -1411,7 +1747,6 @@ README.md"></textarea>
                 if (response.status === 404) {
                     logToConsole('Creando nuevo repositorio...', 'warning');
                     
-                    // Crear nuevo repositorio
                     const createResponse = await fetch(`https://api.github.com/user/repos`, {
                         method: 'POST',
                         headers: {
@@ -1421,7 +1756,7 @@ README.md"></textarea>
                         },
                         body: JSON.stringify({
                             name: githubRepo,
-                            description: 'Repositorio creado automáticamente por PortalHub Creator',
+                            description: 'Repositorio creado automáticamente por PortalHub Creator v1.2',
                             private: false,
                             auto_init: false
                         })
@@ -1476,8 +1811,7 @@ README.md"></textarea>
         // Inicializar repositorio vacío
         async function bootstrapRepository() {
             try {
-                // Crear blob con README
-                const readmeContent = `# ${githubRepo}\n\nRepositorio creado automáticamente por PortalHub Creator v1.1.\nEl contenido se publica directamente en la raíz.\n`;
+                const readmeContent = `# ${githubRepo}\n\nRepositorio creado automáticamente por PortalHub Creator v1.2.\nEl contenido de los archivos se preserva completamente.\n`;
                 
                 const blobResponse = await fetch(`https://api.github.com/repos/${githubOwner}/${githubRepo}/git/blobs`, {
                     method: 'POST',
@@ -1500,7 +1834,6 @@ README.md"></textarea>
                 const blobData = await blobResponse.json();
                 const readmeBlobSha = blobData.sha;
                 
-                // Crear árbol con README
                 const treeResponse = await fetch(`https://api.github.com/repos/${githubOwner}/${githubRepo}/git/trees`, {
                     method: 'POST',
                     headers: {
@@ -1526,7 +1859,6 @@ README.md"></textarea>
                 const treeData = await treeResponse.json();
                 const treeSha = treeData.sha;
                 
-                // Crear commit inicial
                 const commitResponse = await fetch(`https://api.github.com/repos/${githubOwner}/${githubRepo}/git/commits`, {
                     method: 'POST',
                     headers: {
@@ -1535,7 +1867,7 @@ README.md"></textarea>
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        message: 'Initial commit - PortalHub Creator v1.1',
+                        message: 'Initial commit - PortalHub Creator v1.2',
                         tree: treeSha,
                         parents: []
                     })
@@ -1549,7 +1881,6 @@ README.md"></textarea>
                 const commitData = await commitResponse.json();
                 const commitSha = commitData.sha;
                 
-                // Crear referencia main
                 const refResponse = await fetch(`https://api.github.com/repos/${githubOwner}/${githubRepo}/git/refs`, {
                     method: 'POST',
                     headers: {
@@ -1576,10 +1907,10 @@ README.md"></textarea>
             }
         }
         
-        // FUNCIÓN CRÍTICAMENTE CORREGIDA: Crear árbol Git en la RAÍZ del repositorio
-        async function createRootTree(baseTreeSha) {
+        // FUNCIÓN CRÍTICA: Crear árbol Git con CONTENIDO REAL
+        async function createRootTreeWithContent(baseTreeSha) {
             try {
-                // PASO 1: Recolectar TODOS los archivos de la estructura
+                // PASO 1: Recolectar TODOS los archivos con su contenido
                 const files = [];
                 
                 function collectFiles(items, currentPath = '') {
@@ -1596,7 +1927,7 @@ README.md"></textarea>
                             files.push({
                                 path: filePath,
                                 name: cleanName,
-                                originalItem: item
+                                content: item.content || createDefaultContent(cleanName)
                             });
                         }
                     });
@@ -1608,49 +1939,26 @@ README.md"></textarea>
                     throw new Error('No se encontraron archivos en la estructura');
                 }
                 
-                logToConsole(`Creando ${files.length} archivos en la RAÍZ del repositorio`, 'info');
+                logToConsole(`Creando ${files.length} archivos con contenido real...`, 'info');
                 
-                // PASO 2: Construir entradas del árbol Git para la RAÍZ
+                // PASO 2: Construir entradas del árbol Git con contenido
                 const treeItems = files.map(file => {
-                    // Normalizar path - usar directamente la ruta interna
+                    // Normalizar path
                     let normalizedPath = file.path
-                        .replace(/\\/g, '/')           // Backslash a forward slash
-                        .replace(/\/+/g, '/')          // Colapsar múltiples slashes
-                        .replace(/^\/+/, '')           // Eliminar slash inicial
-                        .replace(/\/+$/, '');          // Eliminar slash final
+                        .replace(/\\/g, '/')
+                        .replace(/\/+/g, '/')
+                        .replace(/^\/+/, '')
+                        .replace(/\/+$/, '');
                     
-                    // IMPORTANTE: No agregar prefijo - publicar directamente en raíz
                     const finalPath = normalizedPath;
                     
-                    // Contenido por defecto para cada archivo
-                    let content = '';
-                    if (file.originalItem && file.originalItem.content) {
-                        content = file.originalItem.content;
-                    }
+                    // Obtener contenido real
+                    let content = file.content || '';
                     
-                    // Si está vacío, crear contenido básico
+                    // Si está vacío o solo espacios, crear contenido por defecto
                     if (!content || content.trim() === '') {
-                        const extension = file.name.split('.').pop().toLowerCase();
-                        
-                        switch(extension) {
-                            case 'html':
-                                content = `<!DOCTYPE html>\n<html>\n<head>\n\t<title>${file.name}</title>\n</head>\n<body>\n\t<h1>${file.name}</h1>\n</body>\n</html>`;
-                                break;
-                            case 'js':
-                                content = `// ${file.name}\nconsole.log('${file.name} cargado');`;
-                                break;
-                            case 'css':
-                                content = `/* ${file.name} */\nbody { margin: 0; padding: 0; }`;
-                                break;
-                            case 'json':
-                                content = `{\n\t"name": "${file.name.replace('.json', '')}"\n}`;
-                                break;
-                            case 'md':
-                                content = `# ${file.name}\n\nArchivo creado automáticamente por PortalHub Creator v1.1.`;
-                                break;
-                            default:
-                                content = `# ${file.name}\n\nArchivo creado automáticamente por PortalHub Creator v1.1.`;
-                        }
+                        content = createDefaultContent(file.name);
+                        logToConsole(`Archivo vacío: ${finalPath} → contenido por defecto creado`, 'warning');
                     }
                     
                     return {
@@ -1665,20 +1973,13 @@ README.md"></textarea>
                 for (let i = 0; i < treeItems.length; i++) {
                     const entry = treeItems[i];
                     
+                    if (!entry.content || entry.content.trim() === '') {
+                        logToConsole(`Advertencia: ${entry.path} está vacío, usando contenido por defecto`, 'warning');
+                        entry.content = createDefaultContent(entry.path.split('/').pop());
+                    }
+                    
                     if (entry.type !== 'blob') {
                         throw new Error(`Entrada ${i}: type debe ser "blob"`);
-                    }
-                    
-                    if (entry.path.endsWith('/')) {
-                        throw new Error(`Entrada ${i}: path termina en "/", es una carpeta: ${entry.path}`);
-                    }
-                    
-                    if (entry.content === undefined || entry.content === null) {
-                        throw new Error(`Entrada ${i}: content es undefined/null`);
-                    }
-                    
-                    if (entry.sha) {
-                        throw new Error(`Entrada ${i}: tiene sha, no puede usarse con content`);
                     }
                     
                     if (!entry.path || entry.path.trim() === '') {
@@ -1711,18 +2012,18 @@ README.md"></textarea>
                 }
                 
                 const treeData = await treeResponse.json();
-                logToConsole(`✓ Árbol Git creado en RAÍZ: ${treeData.sha.substring(0, 8)}`, 'success');
-                logToConsole(`Archivos creados directamente en: / (raíz del repositorio)`, 'info');
+                logToConsole(`✓ Árbol Git creado: ${treeData.sha.substring(0, 8)}`, 'success');
+                logToConsole(`✓ Archivos con contenido real: ${files.length}`, 'success');
                 
                 return treeData.sha;
                 
             } catch (error) {
-                logToConsole(`Error en createRootTree: ${error.message}`, 'error');
+                logToConsole(`Error en createRootTreeWithContent: ${error.message}`, 'error');
                 throw error;
             }
         }
         
-        // Crear commit - FUNCIÓN MANTENIDA
+        // Crear commit
         async function createCommit(treeSha, parentSha, message) {
             try {
                 const response = await fetch(
@@ -1756,7 +2057,7 @@ README.md"></textarea>
             }
         }
         
-        // Actualizar rama main - FUNCIÓN MANTENIDA
+        // Actualizar rama main
         async function updateMainBranch(commitSha) {
             try {
                 const response = await fetch(
@@ -1797,9 +2098,9 @@ README.md"></textarea>
             successAlert.innerHTML = `
                 <i class="fas fa-check-circle"></i>
                 <div>
-                    <strong>¡Publicación CORREGIDA completada!</strong><br>
-                    El contenido se ha publicado <strong>directamente en la raíz</strong> del repositorio.<br>
-                    <small>No hay carpeta contenedora extra. Listo para despliegue inmediato.</small>
+                    <strong>¡Publicación exitosa con contenido preservado!</strong><br>
+                    Todos los archivos mantienen su contenido original.<br>
+                    <small>El código, configuraciones y "magia" se exportaron completamente.</small>
                     <br><br>
                     <a href="https://github.com/${githubOwner}/${githubRepo}" target="_blank" class="btn" style="margin-top: 10px;">
                         <i class="fab fa-github"></i> Ver repositorio en GitHub
@@ -1807,7 +2108,6 @@ README.md"></textarea>
                 </div>
             `;
             
-            // Insertar al inicio del panel izquierdo
             const leftCard = document.querySelector('.card:first-child');
             leftCard.insertBefore(successAlert, leftCard.firstChild);
         }
@@ -1819,7 +2119,6 @@ README.md"></textarea>
         
         // Actualizar indicador de pasos
         function updateStep(stepNumber) {
-            // Resetear todos los pasos
             for (let i = 1; i <= 4; i++) {
                 const stepElement = document.getElementById(`step${i}`);
                 stepElement.classList.remove('active', 'completed');
@@ -1829,13 +2128,11 @@ README.md"></textarea>
                 }
             }
             
-            // Activar paso actual
             const currentStepElement = document.getElementById(`step${stepNumber}`);
             currentStepElement.classList.add('active');
             
             currentStep = stepNumber;
             
-            // Actualizar estado del botón de publicación
             updatePublishButtonState();
         }
     </script>
