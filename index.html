@@ -225,6 +225,7 @@
         .indent-3 { margin-left: 60px; }
         .indent-4 { margin-left: 80px; }
         .indent-5 { margin-left: 100px; }
+        .indent-6 { margin-left: 120px; }
         
         .status-section {
             grid-column: 1 / -1;
@@ -461,6 +462,125 @@
             color: var(--text-light);
             margin-top: 5px;
         }
+        
+        .drop-zone {
+            border: 3px dashed var(--border);
+            border-radius: var(--radius-lg);
+            padding: 60px 40px;
+            text-align: center;
+            background-color: #fafbfc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+        
+        .drop-zone:hover {
+            border-color: var(--primary);
+            background-color: #f0fff4;
+        }
+        
+        .drop-zone.dragover {
+            border-color: var(--primary);
+            background-color: #f0fff4;
+            transform: scale(1.01);
+        }
+        
+        .drop-zone i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .drop-zone h3 {
+            margin-bottom: 10px;
+            color: var(--text);
+        }
+        
+        .drop-zone p {
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+        
+        .file-input-hidden {
+            display: none;
+        }
+        
+        .file-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 15px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 10px;
+        }
+        
+        .file-list-item {
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .file-list-item:last-child {
+            border-bottom: none;
+        }
+        
+        .file-list-item i {
+            color: var(--text-light);
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-light);
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+        
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .file-browser {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .file-browser-header {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .path-display {
+            flex: 1;
+            padding: 8px 12px;
+            background-color: #f6f8fa;
+            border-radius: var(--radius);
+            font-family: monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body>
@@ -472,7 +592,7 @@
     <div class="step-indicator">
         <div class="step active" id="step1">
             <div class="step-circle">1</div>
-            <div class="step-label">Seleccionar carpeta</div>
+            <div class="step-label">Seleccionar archivos</div>
         </div>
         <div class="step" id="step2">
             <div class="step-circle">2</div>
@@ -489,38 +609,99 @@
     </div>
     
     <div class="app-container">
-        <!-- Panel izquierdo: Selección de carpeta y vista previa -->
+        <!-- Panel izquierdo: Selección de archivos y vista previa -->
         <div class="card">
-            <h2 class="card-title"><i class="fas fa-folder-open"></i> Seleccionar carpeta local</h2>
+            <h2 class="card-title"><i class="fas fa-folder-open"></i> Seleccionar archivos y carpetas</h2>
             
             <div class="alert alert-info">
                 <i class="fas fa-info-circle"></i>
                 <div>
                     <strong>Importante:</strong> Esta aplicación funciona completamente en tu navegador. 
-                    No se suben los archivos, solo la estructura de carpetas y archivos vacíos.
+                    No se suben los archivos reales, solo la estructura de carpetas y archivos vacíos.
                     Tus archivos permanecen en tu dispositivo.
                 </div>
             </div>
             
-            <div class="form-group">
-                <button id="selectFolderBtn" class="btn btn-block">
-                    <i class="fas fa-folder-plus"></i> Seleccionar carpeta
-                </button>
-                <div id="folderInfo" class="hidden">
+            <div class="tabs">
+                <div class="tab active" data-tab="dragdrop">
+                    <i class="fas fa-cloud-upload-alt"></i> Arrastrar y Soltar
+                </div>
+                <div class="tab" data-tab="fileinput">
+                    <i class="fas fa-folder-open"></i> Seleccionar Archivos
+                </div>
+                <div class="tab" data-tab="manual">
+                    <i class="fas fa-keyboard"></i> Manual
+                </div>
+            </div>
+            
+            <!-- Pestaña 1: Arrastrar y soltar -->
+            <div class="tab-content active" id="dragdrop-tab">
+                <div class="drop-zone" id="dropZone">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h3>Arrastra y suelta archivos y carpetas aquí</h3>
+                    <p>O haz clic para seleccionar archivos</p>
+                    <p><small>Puedes seleccionar múltiples archivos y carpetas</small></p>
+                </div>
+                
+                <input type="file" id="fileInput" class="file-input-hidden" multiple webkitdirectory directory>
+                
+                <div id="selectedFilesInfo" class="hidden">
                     <div class="github-info">
-                        <p><strong>Carpeta seleccionada:</strong> <span id="folderPath">...</span></p>
+                        <p><strong>Archivos seleccionados:</strong> <span id="fileCount">0</span></p>
+                        <p><strong>Carpetas detectadas:</strong> <span id="folderCount">0</span></p>
                         <div class="stats">
                             <div class="stat">
-                                <div class="stat-value" id="folderCount">0</div>
-                                <div class="stat-label">Carpetas</div>
+                                <div class="stat-value" id="totalSize">0</div>
+                                <div class="stat-label">KB total</div>
                             </div>
                             <div class="stat">
-                                <div class="stat-value" id="fileCount">0</div>
-                                <div class="stat-label">Archivos</div>
+                                <div class="stat-value" id="uniqueFolders">0</div>
+                                <div class="stat-label">Carpetas únicas</div>
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="file-list" id="fileList">
+                        <!-- Lista de archivos seleccionados -->
+                    </div>
+                    
+                    <button id="clearFilesBtn" class="btn btn-outline" style="margin-top: 15px;">
+                        <i class="fas fa-trash"></i> Limpiar selección
+                    </button>
                 </div>
+            </div>
+            
+            <!-- Pestaña 2: Entrada manual -->
+            <div class="tab-content" id="manual-tab">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <strong>Modo manual:</strong> Ingresa manualmente la estructura de carpetas y archivos.
+                        Cada línea representa un archivo o carpeta. Usa indentación con espacios para indicar jerarquía.
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="manualStructure" class="form-label">Estructura manual (una por línea):</label>
+                    <textarea id="manualStructure" class="form-control" rows="10" placeholder="Ejemplo:
+src/
+  index.js
+  components/
+    Button.js
+    Header.js
+assets/
+  images/
+    logo.png
+README.md
+package.json"></textarea>
+                    <span class="form-help">
+                        Usa <code>/</code> al final para indicar carpetas. Indenta con 2 espacios por nivel.
+                    </span>
+                </div>
+                
+                <button id="parseManualBtn" class="btn btn-block">
+                    <i class="fas fa-sitemap"></i> Generar estructura desde texto
+                </button>
             </div>
             
             <div id="structureSection" class="hidden">
@@ -599,7 +780,7 @@
             <div class="console" id="console">
                 <div class="console-line">
                     <span class="console-time" id="currentTime">00:00:00</span>
-                    <span class="console-message console-info">PortalHub Creator inicializado. Selecciona una carpeta para comenzar.</span>
+                    <span class="console-message console-info">PortalHub Creator inicializado. Selecciona archivos o ingresa una estructura manual.</span>
                 </div>
             </div>
         </div>
@@ -619,7 +800,7 @@
 
     <script>
         // Variables globales
-        let selectedFolderHandle = null;
+        let selectedFiles = [];
         let folderStructure = [];
         let githubToken = '';
         let githubOwner = '';
@@ -633,24 +814,399 @@
             updateCurrentTime();
             
             // Configurar event listeners
-            document.getElementById('selectFolderBtn').addEventListener('click', selectFolder);
+            setupTabNavigation();
+            setupFileSelection();
+            setupManualInput();
+            
             document.getElementById('githubToken').addEventListener('input', updatePublishButtonState);
             document.getElementById('githubOwner').addEventListener('input', updatePublishButtonState);
             document.getElementById('githubRepo').addEventListener('input', updatePublishButtonState);
             document.getElementById('validateBtn').addEventListener('click', validateGitHubConnection);
             document.getElementById('publishBtn').addEventListener('click', publishToGitHub);
+            document.getElementById('clearFilesBtn').addEventListener('click', clearFileSelection);
+            document.getElementById('parseManualBtn').addEventListener('click', parseManualStructure);
             
             // Actualizar hora actual en consola cada segundo
             setInterval(updateCurrentTime, 1000);
             
-            logToConsole('Aplicación inicializada correctamente.', 'info');
+            logToConsole('Aplicación inicializada correctamente. Compatible con todos los navegadores modernos.', 'info');
         });
         
-        // Actualizar la hora actual en la consola
-        function updateCurrentTime() {
-            const now = new Date();
-            const timeString = now.toTimeString().split(' ')[0];
-            document.getElementById('currentTime').textContent = timeString;
+        // Configurar navegación por pestañas
+        function setupTabNavigation() {
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Remover clase activa de todas las pestañas
+                    tabs.forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    // Activar pestaña seleccionada
+                    this.classList.add('active');
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                });
+            });
+        }
+        
+        // Configurar selección de archivos
+        function setupFileSelection() {
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileInput');
+            
+            // Click en la zona de drop
+            dropZone.addEventListener('click', () => {
+                fileInput.click();
+            });
+            
+            // Arrastrar sobre la zona
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
+            
+            // Salir de la zona de arrastre
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('dragover');
+            });
+            
+            // Soltar archivos
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                
+                if (e.dataTransfer.items) {
+                    // Usar la API DataTransferItemList
+                    const items = e.dataTransfer.items;
+                    const files = [];
+                    
+                    for (let i = 0; i < items.length; i++) {
+                        if (items[i].kind === 'file') {
+                            files.push(items[i].getAsFile());
+                        }
+                    }
+                    
+                    processFiles(files);
+                } else {
+                    // Fallback para navegadores más antiguos
+                    processFiles(e.dataTransfer.files);
+                }
+            });
+            
+            // Cambio en el input de archivos
+            fileInput.addEventListener('change', (e) => {
+                processFiles(Array.from(e.target.files));
+            });
+        }
+        
+        // Configurar entrada manual
+        function setupManualInput() {
+            // Ya configurado en el event listener principal
+        }
+        
+        // Procesar archivos seleccionados
+        function processFiles(files) {
+            if (!files || files.length === 0) return;
+            
+            // Limpiar selección anterior
+            selectedFiles = [];
+            
+            // Agregar nuevos archivos
+            files.forEach(file => {
+                selectedFiles.push({
+                    name: file.name,
+                    path: file.webkitRelativePath || file.name,
+                    size: file.size,
+                    type: file.type,
+                    isDirectory: file.type === '' && (file.name.includes('/') || file.size === 0)
+                });
+            });
+            
+            updateFileSelectionUI();
+            generateFolderStructureFromFiles();
+        }
+        
+        // Actualizar UI de selección de archivos
+        function updateFileSelectionUI() {
+            const fileCount = selectedFiles.length;
+            const folderCount = countUniqueFolders();
+            const totalSize = selectedFiles.reduce((sum, file) => sum + file.size, 0) / 1024;
+            
+            document.getElementById('fileCount').textContent = fileCount;
+            document.getElementById('folderCount').textContent = folderCount;
+            document.getElementById('totalSize').textContent = totalSize.toFixed(2);
+            document.getElementById('uniqueFolders').textContent = folderCount;
+            
+            // Actualizar lista de archivos
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+            
+            selectedFiles.slice(0, 20).forEach(file => {
+                const item = document.createElement('div');
+                item.className = 'file-list-item';
+                
+                const icon = file.isDirectory ? 'fa-folder' : 'fa-file';
+                item.innerHTML = `
+                    <i class="fas ${icon}"></i>
+                    <span>${file.name}</span>
+                    <span style="margin-left: auto; color: var(--text-light); font-size: 0.8rem;">
+                        ${file.isDirectory ? 'Carpeta' : (file.size / 1024).toFixed(2) + ' KB'}
+                    </span>
+                `;
+                
+                fileList.appendChild(item);
+            });
+            
+            if (selectedFiles.length > 20) {
+                const moreItem = document.createElement('div');
+                moreItem.className = 'file-list-item';
+                moreItem.style.fontStyle = 'italic';
+                moreItem.textContent = `... y ${selectedFiles.length - 20} archivos más`;
+                fileList.appendChild(moreItem);
+            }
+            
+            // Mostrar información de archivos seleccionados
+            document.getElementById('selectedFilesInfo').classList.remove('hidden');
+            updateStep(2);
+            
+            logToConsole(`${fileCount} archivos seleccionados, ${folderCount} carpetas detectadas.`, 'success');
+        }
+        
+        // Contar carpetas únicas
+        function countUniqueFolders() {
+            const folders = new Set();
+            
+            selectedFiles.forEach(file => {
+                const path = file.path || file.name;
+                const parts = path.split('/');
+                
+                // Si hay más de una parte, hay carpetas en la ruta
+                if (parts.length > 1) {
+                    // Agregar todas las carpetas en la ruta
+                    let currentPath = '';
+                    for (let i = 0; i < parts.length - 1; i++) {
+                        currentPath = currentPath ? `${currentPath}/${parts[i]}` : parts[i];
+                        folders.add(currentPath);
+                    }
+                }
+            });
+            
+            return folders.size;
+        }
+        
+        // Generar estructura de carpetas a partir de archivos
+        function generateFolderStructureFromFiles() {
+            folderStructure = [];
+            
+            // Crear un mapa para organizar archivos por ruta
+            const pathMap = {};
+            
+            selectedFiles.forEach(file => {
+                const path = file.path || file.name;
+                const parts = path.split('/');
+                
+                // Si es un archivo en la raíz
+                if (parts.length === 1) {
+                    folderStructure.push({
+                        name: parts[0],
+                        path: parts[0],
+                        type: 'file'
+                    });
+                } else {
+                    // Construir estructura jerárquica
+                    let currentLevel = folderStructure;
+                    let currentPath = '';
+                    
+                    for (let i = 0; i < parts.length; i++) {
+                        const part = parts[i];
+                        currentPath = currentPath ? `${currentPath}/${part}` : part;
+                        
+                        // Buscar si ya existe este nivel
+                        let existingItem = currentLevel.find(item => item.name === part);
+                        
+                        // Si es el último elemento y es un archivo
+                        if (i === parts.length - 1) {
+                            if (!existingItem) {
+                                currentLevel.push({
+                                    name: part,
+                                    path: currentPath,
+                                    type: 'file'
+                                });
+                            }
+                        } else {
+                            // Es una carpeta
+                            if (!existingItem) {
+                                existingItem = {
+                                    name: part,
+                                    path: currentPath,
+                                    type: 'folder',
+                                    children: []
+                                };
+                                currentLevel.push(existingItem);
+                            }
+                            
+                            // Asegurar que tiene children si es una carpeta
+                            if (!existingItem.children) {
+                                existingItem.children = [];
+                            }
+                            
+                            currentLevel = existingItem.children;
+                        }
+                    }
+                }
+            });
+            
+            // Ordenar estructura: carpetas primero, luego archivos
+            function sortStructure(items) {
+                items.sort((a, b) => {
+                    if (a.type === b.type) {
+                        return a.name.localeCompare(b.name);
+                    }
+                    return a.type === 'folder' ? -1 : 1;
+                });
+                
+                items.forEach(item => {
+                    if (item.children) {
+                        sortStructure(item.children);
+                    }
+                });
+            }
+            
+            sortStructure(folderStructure);
+            displayFolderStructure(folderStructure);
+            
+            logToConsole(`Estructura generada con ${folderStructure.length} elementos en la raíz.`, 'info');
+        }
+        
+        // Parsear estructura manual desde texto
+        function parseManualStructure() {
+            const text = document.getElementById('manualStructure').value;
+            if (!text.trim()) {
+                alert('Por favor, ingresa una estructura en el área de texto.');
+                return;
+            }
+            
+            const lines = text.split('\n');
+            folderStructure = [];
+            const stack = [{ level: -1, children: folderStructure }];
+            
+            lines.forEach(line => {
+                if (!line.trim()) return;
+                
+                // Calcular nivel de indentación (2 espacios por nivel)
+                const indent = line.search(/\S/);
+                const level = Math.floor(indent / 2);
+                const name = line.trim();
+                
+                // Determinar si es carpeta (termina con /)
+                const isFolder = name.endsWith('/');
+                const cleanName = isFolder ? name.slice(0, -1) : name;
+                
+                // Encontrar el padre correcto en la pila
+                while (stack.length > 0 && stack[stack.length - 1].level >= level) {
+                    stack.pop();
+                }
+                
+                const parent = stack[stack.length - 1];
+                const newItem = {
+                    name: cleanName,
+                    path: cleanName,
+                    type: isFolder ? 'folder' : 'file'
+                };
+                
+                if (isFolder) {
+                    newItem.children = [];
+                }
+                
+                parent.children.push(newItem);
+                
+                if (isFolder) {
+                    stack.push({ level: level, children: newItem.children });
+                }
+            });
+            
+            // Actualizar UI
+            document.getElementById('selectedFilesInfo').classList.add('hidden');
+            document.getElementById('structureSection').classList.remove('hidden');
+            
+            // Actualizar estadísticas
+            const folderCount = countItemsByType(folderStructure, 'folder');
+            const fileCount = countItemsByType(folderStructure, 'file');
+            
+            document.getElementById('folderCount').textContent = folderCount;
+            document.getElementById('fileCount').textContent = fileCount;
+            
+            displayFolderStructure(folderStructure);
+            updateStep(2);
+            
+            logToConsole(`Estructura manual parseada: ${folderCount} carpetas, ${fileCount} archivos.`, 'success');
+        }
+        
+        // Contar elementos por tipo
+        function countItemsByType(items, type) {
+            let count = 0;
+            
+            function countRecursive(items) {
+                items.forEach(item => {
+                    if (item.type === type) {
+                        count++;
+                    }
+                    if (item.children) {
+                        countRecursive(item.children);
+                    }
+                });
+            }
+            
+            countRecursive(items);
+            return count;
+        }
+        
+        // Limpiar selección de archivos
+        function clearFileSelection() {
+            selectedFiles = [];
+            folderStructure = [];
+            
+            document.getElementById('selectedFilesInfo').classList.add('hidden');
+            document.getElementById('structureSection').classList.add('hidden');
+            document.getElementById('fileInput').value = '';
+            
+            logToConsole('Selección de archivos limpiada.', 'info');
+        }
+        
+        // Mostrar estructura de carpetas en el panel
+        function displayFolderStructure(structure) {
+            const container = document.getElementById('folderStructure');
+            container.innerHTML = '';
+            
+            // Agregar la carpeta raíz portalHub
+            const portalHubItem = document.createElement('div');
+            portalHubItem.className = `file-item folder`;
+            portalHubItem.innerHTML = `<i class="fas fa-folder"></i> portalHub/`;
+            container.appendChild(portalHubItem);
+            
+            // Función recursiva para mostrar elementos
+            function displayItems(items, level) {
+                items.forEach(item => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = `file-item ${item.type} indent-${level}`;
+                    
+                    const icon = item.type === 'folder' ? 'fa-folder' : 'fa-file';
+                    itemElement.innerHTML = `<i class="fas ${icon}"></i> ${item.name}${item.type === 'folder' ? '/' : ''}`;
+                    
+                    container.appendChild(itemElement);
+                    
+                    // Si es una carpeta con hijos, mostrarlos
+                    if (item.children && item.children.length > 0) {
+                        displayItems(item.children, level + 1);
+                    }
+                });
+            }
+            
+            // Mostrar todos los elementos bajo portalHub
+            displayItems(structure, 1);
+            
+            document.getElementById('structureSection').classList.remove('hidden');
         }
         
         // Registrar mensajes en la consola
@@ -677,111 +1233,11 @@
             consoleElement.scrollTop = consoleElement.scrollHeight;
         }
         
-        // Seleccionar carpeta usando File System Access API
-        async function selectFolder() {
-            try {
-                // Verificar si la API está disponible
-                if (!window.showDirectoryPicker) {
-                    throw new Error('La API de selección de carpetas no está disponible en este navegador. Usa Chrome/Edge 86+ o Firefox 111+.');
-                }
-                
-                // Solicitar al usuario que seleccione una carpeta
-                selectedFolderHandle = await window.showDirectoryPicker();
-                
-                // Obtener información de la carpeta
-                const folderInfo = document.getElementById('folderInfo');
-                const folderPath = document.getElementById('folderPath');
-                const folderName = selectedFolderHandle.name;
-                
-                folderPath.textContent = folderName;
-                folderInfo.classList.remove('hidden');
-                
-                // Leer estructura de la carpeta
-                logToConsole(`Leyendo estructura de la carpeta: ${folderName}`, 'info');
-                folderStructure = await readFolderStructure(selectedFolderHandle);
-                
-                // Actualizar estadísticas
-                const folderCount = folderStructure.filter(item => item.type === 'folder').length;
-                const fileCount = folderStructure.filter(item => item.type === 'file').length;
-                
-                document.getElementById('folderCount').textContent = folderCount;
-                document.getElementById('fileCount').textContent = fileCount;
-                
-                // Mostrar estructura
-                displayFolderStructure(folderStructure);
-                document.getElementById('structureSection').classList.remove('hidden');
-                
-                // Actualizar pasos
-                updateStep(2);
-                logToConsole(`Estructura leída: ${folderCount} carpetas, ${fileCount} archivos.`, 'success');
-                
-            } catch (error) {
-                if (error.name === 'AbortError') {
-                    logToConsole('Selección de carpeta cancelada por el usuario.', 'warning');
-                } else {
-                    logToConsole(`Error al seleccionar carpeta: ${error.message}`, 'error');
-                    alert(`Error: ${error.message}\n\nAsegúrate de usar un navegador compatible (Chrome/Edge 86+ o Firefox 111+).`);
-                }
-            }
-        }
-        
-        // Leer recursivamente la estructura de carpetas
-        async function readFolderStructure(dirHandle, path = '') {
-            const entries = [];
-            
-            for await (const entry of dirHandle.values()) {
-                const entryPath = path ? `${path}/${entry.name}` : entry.name;
-                
-                if (entry.kind === 'directory') {
-                    entries.push({
-                        name: entry.name,
-                        path: entryPath,
-                        type: 'folder',
-                        children: await readFolderStructure(entry, entryPath)
-                    });
-                } else {
-                    entries.push({
-                        name: entry.name,
-                        path: entryPath,
-                        type: 'file'
-                    });
-                }
-            }
-            
-            return entries;
-        }
-        
-        // Mostrar estructura de carpetas en el panel
-        function displayFolderStructure(structure, indentLevel = 0) {
-            const container = document.getElementById('folderStructure');
-            container.innerHTML = '';
-            
-            // Agregar la carpeta raíz portalHub
-            const portalHubItem = document.createElement('div');
-            portalHubItem.className = `file-item folder indent-${indentLevel}`;
-            portalHubItem.innerHTML = `<i class="fas fa-folder"></i> portalHub/`;
-            container.appendChild(portalHubItem);
-            
-            // Función recursiva para mostrar elementos
-            function displayItems(items, level) {
-                items.forEach(item => {
-                    const itemElement = document.createElement('div');
-                    itemElement.className = `file-item ${item.type} indent-${level}`;
-                    
-                    const icon = item.type === 'folder' ? 'fa-folder' : 'fa-file';
-                    itemElement.innerHTML = `<i class="fas ${icon}"></i> ${item.name}${item.type === 'folder' ? '/' : ''}`;
-                    
-                    container.appendChild(itemElement);
-                    
-                    // Si es una carpeta con hijos, mostrarlos
-                    if (item.children) {
-                        displayItems(item.children, level + 1);
-                    }
-                });
-            }
-            
-            // Mostrar todos los elementos bajo portalHub
-            displayItems(structure, indentLevel + 1);
+        // Actualizar la hora actual en la consola
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeString = now.toTimeString().split(' ')[0];
+            document.getElementById('currentTime').textContent = timeString;
         }
         
         // Actualizar estado del botón de publicación
@@ -794,9 +1250,10 @@
             const publishBtn = document.getElementById('publishBtn');
             
             const hasCredentials = token && owner && repo;
+            const hasStructure = folderStructure && folderStructure.length > 0;
             
             validateBtn.disabled = !hasCredentials;
-            publishBtn.disabled = !hasCredentials || !selectedFolderHandle;
+            publishBtn.disabled = !hasCredentials || !hasStructure;
         }
         
         // Validar conexión con GitHub
@@ -864,8 +1321,8 @@
         
         // Publicar estructura en GitHub
         async function publishToGitHub() {
-            if (!selectedFolderHandle || !folderStructure.length) {
-                alert('Primero selecciona una carpeta local.');
+            if (!folderStructure || folderStructure.length === 0) {
+                alert('Primero selecciona o crea una estructura de carpetas.');
                 return;
             }
             
@@ -1136,12 +1593,11 @@
                             treeItems.push({
                                 path: itemPath,
                                 mode: '040000',
-                                type: 'tree',
-                                sha: null // Se llenará más tarde
+                                type: 'tree'
                             });
                             
                             // Procesar hijos
-                            if (item.children) {
+                            if (item.children && item.children.length > 0) {
                                 addToTree(item.children, itemPath);
                             }
                         } else {
@@ -1266,6 +1722,9 @@
             currentStepElement.classList.add('active');
             
             currentStep = stepNumber;
+            
+            // Actualizar estado del botón de publicación
+            updatePublishButtonState();
         }
     </script>
 </body>
