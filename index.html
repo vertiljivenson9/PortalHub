@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PortalHub Creator v1.2 - Preserva contenido de archivos</title>
+    <title>PortalHub Creator v1.3 - Nombres normalizados</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -585,8 +585,8 @@
 </head>
 <body>
     <div class="header">
-        <h1><i class="fas fa-project-diagram"></i> PortalHub Creator v1.2</h1>
-        <p>Preserva el contenido real de tus archivos al publicar en GitHub</p>
+        <h1><i class="fas fa-project-diagram"></i> PortalHub Creator v1.3</h1>
+        <p>Normalización automática de nombres de archivo a minúsculas</p>
     </div>
     
     <div class="step-indicator">
@@ -616,8 +616,8 @@
             <div class="alert alert-success">
                 <i class="fas fa-check-circle"></i>
                 <div>
-                    <strong>v1.2 - Contenido preservado:</strong> Los archivos mantienen su contenido original.
-                    Si están vacíos, se crea contenido por defecto apropiado para cada tipo.
+                    <strong>v1.3 - Nombres normalizados:</strong> Los nombres de archivo se convierten automáticamente a minúsculas.
+                    Ejemplo: "Gmail.html" → "gmail.html", "MiArchivo.js" → "miarchivo.js"
                 </div>
             </div>
             
@@ -636,7 +636,7 @@
                     <i class="fas fa-folder-open"></i>
                     <h3>Arrastra y suelta una carpeta aquí</h3>
                     <p>O haz clic para seleccionar una carpeta</p>
-                    <p><small>El contenido de los archivos se preservará completamente</small></p>
+                    <p><small>Nombres se normalizan automáticamente a minúsculas</small></p>
                 </div>
                 
                 <input type="file" id="folderInput" class="file-input-hidden" webkitdirectory directory>
@@ -652,8 +652,8 @@
                                 <div class="stat-label">Carpetas únicas</div>
                             </div>
                             <div class="stat">
-                                <div class="stat-value" id="contentPreserved">0</div>
-                                <div class="stat-label">Archivos con contenido</div>
+                                <div class="stat-value" id="normalizedFiles">0</div>
+                                <div class="stat-label">Archivos normalizados</div>
                             </div>
                         </div>
                     </div>
@@ -673,8 +673,8 @@
                 <div class="alert alert-warning">
                     <i class="fas fa-exclamation-triangle"></i>
                     <div>
-                        <strong>Estructura manual:</strong> Define la estructura de archivos y carpetas.
-                        Para archivos con contenido específico, usa el editor avanzado.
+                        <strong>Nombres normalizados:</strong> Los nombres que ingreses se convertirán automáticamente a minúsculas.
+                        Esto asegura compatibilidad web óptima.
                     </div>
                 </div>
                 
@@ -683,28 +683,35 @@
                     <textarea id="manualStructure" class="form-control" rows="8" placeholder="Ejemplo:
 index.html
 src/
-  main.js
-  styles.css
+  Main.js
+  Styles.css
 assets/
-  images/
-    logo.png
+  Images/
+    Logo.png
 README.md"></textarea>
                     <span class="form-help">
-                        Usa <code>/</code> al final para indicar carpetas. Indenta con 2 espacios por nivel.
+                        Los nombres se convertirán a minúsculas: "Main.js" → "main.js", "Logo.png" → "logo.png"
                     </span>
                 </div>
                 
                 <div class="form-group">
                     <label for="fileContentEditor" class="form-label">Editor de contenido avanzado:</label>
-                    <textarea id="fileContentEditor" class="form-control" rows="6" placeholder="Puedes pegar contenido específico para archivos aquí.
-Formato: ruta/archivo.ext
-Contenido...
+                    <textarea id="fileContentEditor" class="form-control" rows="6" placeholder="Ejemplo:
+components/Header.js
+import React from 'react';
+
+export default function Header() {
+  return <header>Mi Aplicación</header>;
+}
 ---
-otra/ruta/archivo2.js
-Contenido...
----"></textarea>
+styles/Main.css
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}"></textarea>
                     <span class="form-help">
-                        Define contenido específico para archivos. Separa con <code>---</code> en una línea nueva.
+                        Define contenido específico para archivos. Los nombres de ruta se normalizarán a minúsculas.
                     </span>
                 </div>
                 
@@ -733,7 +740,7 @@ Contenido...
                 
                 <p class="form-help">
                     <i class="fas fa-info-circle"></i>
-                    Todos los elementos se publicarán directamente en la raíz del repositorio.
+                    Todos los nombres se publicarán en minúsculas para máxima compatibilidad web.
                 </p>
             </div>
         </div>
@@ -745,8 +752,8 @@ Contenido...
             <div class="alert alert-info">
                 <i class="fas fa-shield-alt"></i>
                 <div>
-                    <strong>Contenido preservado:</strong> Los archivos mantienen su magia intacta.
-                    Código, configuraciones y contenido se exportan tal cual.
+                    <strong>Compatibilidad web:</strong> Los nombres en minúsculas evitan problemas en servidores
+                    case-sensitive y mejoran la portabilidad entre sistemas.
                 </div>
             </div>
             
@@ -788,7 +795,7 @@ Contenido...
             
             <div class="form-group">
                 <button id="publishBtn" class="btn btn-block" disabled>
-                    <i class="fas fa-rocket"></i> Publicar con contenido completo
+                    <i class="fas fa-rocket"></i> Publicar con nombres normalizados
                 </button>
                 <div class="progress-bar hidden" id="progressBar">
                     <div class="progress-fill" id="progressFill"></div>
@@ -802,7 +809,7 @@ Contenido...
             <div class="console" id="console">
                 <div class="console-line">
                     <span class="console-time" id="currentTime">00:00:00</span>
-                    <span class="console-message console-info">PortalHub Creator v1.2 inicializado. Contenido de archivos preservado.</span>
+                    <span class="console-message console-info">PortalHub Creator v1.3 inicializado. Nombres de archivo se normalizan a minúsculas.</span>
                 </div>
             </div>
         </div>
@@ -810,13 +817,13 @@ Contenido...
     
     <div class="footer">
         <p>
-            PortalHub Creator v1.2 - Preservación de contenido | 
+            PortalHub Creator v1.3 - Normalización de nombres | 
             <a href="https://docs.github.com/en/rest/git" target="_blank">GitHub REST API</a> | 
-            Archivos con su contenido real
+            Archivos compatibles con servidores web
         </p>
         <p>
             <i class="fas fa-code"></i> 
-            El contenido de los archivos se exporta completamente. Si están vacíos, se genera contenido apropiado.
+            Los nombres se convierten automáticamente a minúsculas: "Gmail.html" → "gmail.html"
         </p>
     </div>
 
@@ -830,7 +837,55 @@ Contenido...
         let currentStep = 1;
         let consoleElement = null;
         let baseFolderName = '';
-        let fileContents = new Map(); // Mapa para almacenar contenido de archivos
+        let fileContents = new Map();
+        
+        // FUNCIÓN NUEVA: Normalizar nombres de archivo y rutas
+        function normalizeFileName(filename) {
+            if (!filename) return filename;
+            
+            // Convertir todo a minúsculas
+            let normalized = filename.toLowerCase();
+            
+            // Reemplazar espacios por guiones
+            normalized = normalized.replace(/\s+/g, '-');
+            
+            // Eliminar caracteres especiales, mantener solo letras, números, guiones, puntos y guiones bajos
+            normalized = normalized.replace(/[^a-z0-9._-]/g, '');
+            
+            // Asegurar que no empiece o termine con punto o guión
+            normalized = normalized.replace(/^[._-]+/, '').replace(/[._-]+$/, '');
+            
+            // Reemplazar múltiples guiones por uno solo
+            normalized = normalized.replace(/-+/g, '-');
+            normalized = normalized.replace(/\.+/g, '.');
+            normalized = normalized.replace(/_+/g, '_');
+            
+            return normalized;
+        }
+        
+        // FUNCIÓN NUEVA: Normalizar ruta completa
+        function normalizePath(path) {
+            if (!path) return path;
+            
+            // Separar por directorios
+            const parts = path.split('/');
+            
+            // Normalizar cada parte
+            const normalizedParts = parts.map(part => {
+                // Para archivos, separar nombre y extensión
+                const lastDotIndex = part.lastIndexOf('.');
+                if (lastDotIndex > 0) {
+                    const name = part.substring(0, lastDotIndex);
+                    const extension = part.substring(lastDotIndex);
+                    return normalizeFileName(name) + extension.toLowerCase();
+                }
+                // Para carpetas, solo normalizar el nombre
+                return normalizeFileName(part);
+            });
+            
+            // Reconstruir ruta
+            return normalizedParts.join('/');
+        }
         
         // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
@@ -854,7 +909,7 @@ Contenido...
             // Actualizar hora actual en consola
             setInterval(updateCurrentTime, 1000);
             
-            logToConsole('PortalHub Creator v1.2 inicializado. Contenido de archivos preservado.', 'success');
+            logToConsole('PortalHub Creator v1.3 inicializado. Nombres se normalizan a minúsculas automáticamente.', 'success');
         });
         
         // Configurar navegación por pestañas
@@ -967,7 +1022,7 @@ Contenido...
             // Ya configurado en event listener principal
         }
         
-        // Procesar archivos de carpeta - LEE CONTENIDO REAL
+        // Procesar archivos de carpeta - CON NORMALIZACIÓN DE NOMBRES
         async function processFolderFiles(files) {
             selectedFiles = [];
             fileContents.clear();
@@ -986,21 +1041,32 @@ Contenido...
                     }
                 }
                 
+                // NORMALIZAR: Convertir ruta a minúsculas y formato web compatible
+                const originalPath = relativePath;
+                relativePath = normalizePath(relativePath);
+                
                 // Leer contenido del archivo
                 try {
                     const content = await readFileContent(file);
                     fileContents.set(relativePath, content);
                     
                     selectedFiles.push({
+                        originalName: file.name,
+                        originalPath: originalPath,
                         name: file.name,
                         path: relativePath,
                         size: file.size,
                         type: file.type,
                         isDirectory: file.type === '' && (relativePath.includes('/') || file.size === 0),
-                        content: content
+                        content: content,
+                        wasNormalized: originalPath !== relativePath
                     });
                     
-                    logToConsole(`✓ Leído: ${relativePath} (${file.size} bytes)`, 'info');
+                    if (originalPath !== relativePath) {
+                        logToConsole(`✓ Normalizado: "${originalPath}" → "${relativePath}"`, 'info');
+                    } else {
+                        logToConsole(`✓ Leído: ${relativePath}`, 'info');
+                    }
                 } catch (error) {
                     logToConsole(`✗ Error leyendo ${relativePath}: ${error.message}`, 'error');
                     
@@ -1009,12 +1075,15 @@ Contenido...
                     fileContents.set(relativePath, defaultContent);
                     
                     selectedFiles.push({
+                        originalName: file.name,
+                        originalPath: originalPath,
                         name: file.name,
                         path: relativePath,
                         size: file.size,
                         type: file.type,
                         isDirectory: file.type === '' && (relativePath.includes('/') || file.size === 0),
-                        content: defaultContent
+                        content: defaultContent,
+                        wasNormalized: originalPath !== relativePath
                     });
                 }
             }
@@ -1070,13 +1139,13 @@ Contenido...
 </head>
 <body>
     <h1>${filename}</h1>
-    <p>Archivo creado automáticamente por PortalHub Creator v1.2</p>
+    <p>Archivo creado automáticamente por PortalHub Creator v1.3</p>
 </body>
 </html>`;
                     
                 case 'js':
                     return `// ${filename}
-// Archivo creado automáticamente por PortalHub Creator v1.2
+// Archivo creado automáticamente por PortalHub Creator v1.3
 
 console.log('${filename} cargado');
 
@@ -1088,7 +1157,7 @@ module.exports = { init };`;
                     
                 case 'css':
                     return `/* ${filename} */
-/* Archivo creado automáticamente por PortalHub Creator v1.2 */
+/* Archivo creado automáticamente por PortalHub Creator v1.3 */
 
 body {
     margin: 0;
@@ -1107,7 +1176,7 @@ body {
                     return JSON.stringify({
                         name: name,
                         version: "1.0.0",
-                        description: "Archivo creado automáticamente por PortalHub Creator v1.2",
+                        description: "Archivo creado automáticamente por PortalHub Creator v1.3",
                         main: "index.js",
                         scripts: {
                             start: "node index.js"
@@ -1119,7 +1188,7 @@ body {
                 case 'md':
                     return `# ${filename}
 
-Archivo creado automáticamente por PortalHub Creator v1.2.
+Archivo creado automáticamente por PortalHub Creator v1.3.
 
 ## Descripción
 
@@ -1127,7 +1196,7 @@ Este archivo fue generado automáticamente.`;
 
                 case 'py':
                     return `# ${filename}
-# Archivo creado automáticamente por PortalHub Creator v1.2
+# Archivo creado automáticamente por PortalHub Creator v1.3
 
 def main():
     print("Hello from ${filename}")
@@ -1138,7 +1207,7 @@ if __name__ == "__main__":
                 case 'php':
                     return `<?php
 // ${filename}
-// Archivo creado automáticamente por PortalHub Creator v1.2
+// Archivo creado automáticamente por PortalHub Creator v1.3
 
 echo "Hello from ${filename}";
 ?>`;
@@ -1146,7 +1215,7 @@ echo "Hello from ${filename}";
                 default:
                     return `# ${filename}
 
-Archivo creado automáticamente por PortalHub Creator v1.2.
+Archivo creado automáticamente por PortalHub Creator v1.3.
 
 Este archivo fue generado automáticamente. Su contenido puede ser editado según sea necesario.`;
             }
@@ -1156,13 +1225,13 @@ Este archivo fue generado automáticamente. Su contenido puede ser editado segú
         function updateFolderSelectionUI() {
             const fileCount = selectedFiles.length;
             const folderCount = countUniqueFolders();
-            const filesWithContent = selectedFiles.filter(f => f.content && f.content.trim() !== '').length;
+            const normalizedCount = selectedFiles.filter(f => f.wasNormalized).length;
             
             document.getElementById('selectedFolderName').textContent = baseFolderName || 'Carpeta sin nombre';
             document.getElementById('fileCount').textContent = fileCount;
             document.getElementById('folderCount').textContent = folderCount;
             document.getElementById('uniqueFolders').textContent = folderCount;
-            document.getElementById('contentPreserved').textContent = filesWithContent;
+            document.getElementById('normalizedFiles').textContent = normalizedCount;
             
             // Actualizar lista de archivos
             const fileList = document.getElementById('fileList');
@@ -1178,8 +1247,15 @@ Este archivo fue generado automáticamente. Su contenido puede ser editado segú
                     const icon = file.isDirectory ? 'fa-folder' : 'fa-file';
                     const hasContent = file.content && file.content.trim() !== '';
                     const contentIndicator = hasContent ? ' <span style="color: var(--success); font-size: 0.7rem;">✓</span>' : '';
+                    const normalizedIndicator = file.wasNormalized ? ' <span style="color: var(--warning); font-size: 0.7rem;">↴</span>' : '';
                     
-                    item.innerHTML = `<i class="fas ${icon}"></i> <span>${file.path}${contentIndicator}</span>`;
+                    item.innerHTML = `<i class="fas ${icon}"></i> <span>${file.path}${contentIndicator}${normalizedIndicator}</span>`;
+                    
+                    if (file.wasNormalized) {
+                        item.title = `Original: ${file.originalPath}`;
+                        item.style.color = 'var(--warning)';
+                    }
+                    
                     fileList.appendChild(item);
                     uniqueFiles[file.path] = true;
                 }
@@ -1189,7 +1265,7 @@ Este archivo fue generado automáticamente. Su contenido puede ser editado segú
             document.getElementById('selectedFolderInfo').classList.remove('hidden');
             updateStep(2);
             
-            logToConsole(`Carpeta "${baseFolderName}" procesada: ${fileCount} archivos, ${filesWithContent} con contenido.`, 'success');
+            logToConsole(`Carpeta procesada: ${fileCount} archivos, ${normalizedCount} nombres normalizados.`, 'success');
         }
         
         // Contar carpetas únicas internas
@@ -1226,7 +1302,9 @@ Este archivo fue generado automáticamente. Su contenido puede ser editado segú
                         name: parts[0],
                         path: parts[0],
                         type: 'file',
-                        content: file.content
+                        content: file.content,
+                        wasNormalized: file.wasNormalized,
+                        originalName: file.originalName
                     });
                 } else {
                     // Construir estructura jerárquica
@@ -1248,7 +1326,9 @@ Este archivo fue generado automáticamente. Su contenido puede ser editado segú
                                     name: part,
                                     path: currentPath,
                                     type: 'file',
-                                    content: file.content
+                                    content: file.content,
+                                    wasNormalized: file.wasNormalized,
+                                    originalName: file.originalName
                                 });
                             }
                         } else {
@@ -1295,7 +1375,7 @@ Este archivo fue generado automáticamente. Su contenido puede ser editado segú
             logToConsole(`Estructura generada: ${folderStructure.length} elementos en la raíz.`, 'info');
         }
         
-        // Parsear estructura manual con contenido
+        // Parsear estructura manual con contenido y NORMALIZACIÓN
         function parseManualStructure() {
             const basicText = document.getElementById('manualStructure').value;
             const contentText = document.getElementById('fileContentEditor').value;
@@ -1323,29 +1403,38 @@ Este archivo fue generado automáticamente. Su contenido puede ser editado segú
                     const isFolder = name.endsWith('/');
                     const cleanName = isFolder ? name.slice(0, -1) : name;
                     
+                    // NORMALIZAR el nombre
+                    const normalizedName = normalizeFileName(cleanName);
+                    
                     while (stack.length > 0 && stack[stack.length - 1].level >= level) {
                         stack.pop();
                     }
                     
                     const parent = stack[stack.length - 1];
                     const newItem = {
-                        name: cleanName,
-                        path: cleanName,
-                        type: isFolder ? 'folder' : 'file'
+                        name: normalizedName,
+                        originalName: cleanName,
+                        path: normalizedName,
+                        type: isFolder ? 'folder' : 'file',
+                        wasNormalized: cleanName !== normalizedName
                     };
                     
                     if (isFolder) {
                         newItem.children = [];
                     } else {
                         // Para archivos en estructura básica, crear contenido por defecto
-                        newItem.content = createDefaultContent(cleanName);
-                        fileContents.set(cleanName, newItem.content);
+                        newItem.content = createDefaultContent(normalizedName);
+                        fileContents.set(normalizedName, newItem.content);
                     }
                     
                     parent.children.push(newItem);
                     
                     if (isFolder) {
                         stack.push({ level: level, children: newItem.children });
+                    }
+                    
+                    if (cleanName !== normalizedName) {
+                        logToConsole(`Normalizado en estructura básica: "${cleanName}" → "${normalizedName}"`, 'info');
                     }
                 });
             }
@@ -1358,11 +1447,15 @@ Este archivo fue generado automáticamente. Su contenido puede ser editado segú
                     const lines = section.split('\n');
                     if (lines.length < 2) return;
                     
-                    const filePath = lines[0].trim();
+                    let filePath = lines[0].trim();
                     const content = lines.slice(1).join('\n');
                     
+                    // NORMALIZAR la ruta del archivo
+                    const originalPath = filePath;
+                    filePath = normalizePath(filePath);
+                    
                     // Buscar y actualizar el archivo en la estructura
-                    function updateFileContent(items, pathParts, content, currentPath = '') {
+                    function updateFileContent(items, content, currentPath = '') {
                         for (let i = 0; i < items.length; i++) {
                             const item = items[i];
                             const itemPath = currentPath ? `${currentPath}/${item.name}` : item.name;
@@ -1374,7 +1467,7 @@ Este archivo fue generado automáticamente. Su contenido puede ser editado segú
                             }
                             
                             if (item.children) {
-                                if (updateFileContent(item.children, pathParts, content, itemPath)) {
+                                if (updateFileContent(item.children, content, itemPath)) {
                                     return true;
                                 }
                             }
@@ -1382,10 +1475,11 @@ Este archivo fue generado automáticamente. Su contenido puede ser editado segú
                         return false;
                     }
                     
-                    if (!updateFileContent(folderStructure, filePath.split('/'), content)) {
+                    if (!updateFileContent(folderStructure, content)) {
                         // Si el archivo no existe en la estructura, crearlo
                         const parts = filePath.split('/');
                         let currentLevel = folderStructure;
+                        let currentPath = '';
                         
                         for (let i = 0; i < parts.length; i++) {
                             const part = parts[i];
@@ -1395,11 +1489,16 @@ Este archivo fue generado automáticamente. Su contenido puede ser editado segú
                             
                             if (isLast) {
                                 if (!existingItem) {
+                                    const fileName = part;
+                                    const originalFileName = originalPath.split('/').pop() || fileName;
+                                    
                                     currentLevel.push({
-                                        name: part,
+                                        name: fileName,
+                                        originalName: originalFileName,
                                         path: filePath,
                                         type: 'file',
-                                        content: content
+                                        content: content,
+                                        wasNormalized: originalFileName !== fileName
                                     });
                                     fileContents.set(filePath, content);
                                 }
@@ -1407,6 +1506,7 @@ Este archivo fue generado automáticamente. Su contenido puede ser editado segú
                                 if (!existingItem) {
                                     existingItem = {
                                         name: part,
+                                        originalName: part,
                                         path: part,
                                         type: 'folder',
                                         children: []
@@ -1420,7 +1520,12 @@ Este archivo fue generado automáticamente. Su contenido puede ser editado segú
                                 
                                 currentLevel = existingItem.children;
                             }
+                            currentPath = currentPath ? `${currentPath}/${part}` : part;
                         }
+                    }
+                    
+                    if (originalPath !== filePath) {
+                        logToConsole(`Normalizado en contenido avanzado: "${originalPath}" → "${filePath}"`, 'info');
                     }
                 });
             }
@@ -1432,12 +1537,12 @@ Este archivo fue generado automáticamente. Su contenido puede ser editado segú
             // Actualizar estadísticas
             const folderCount = countItemsByType(folderStructure, 'folder');
             const fileCount = countItemsByType(folderStructure, 'file');
-            const filesWithContent = Array.from(fileContents.values()).filter(c => c && c.trim() !== '').length;
+            const normalizedCount = folderStructure.filter(item => item.wasNormalized).length;
             
-            document.getElementById('folderCount').textContent = folderCount;
             document.getElementById('fileCount').textContent = fileCount;
+            document.getElementById('folderCount').textContent = folderCount;
             document.getElementById('selectedFolderName').textContent = 'Estructura manual';
-            document.getElementById('contentPreserved').textContent = filesWithContent;
+            document.getElementById('normalizedFiles').textContent = normalizedCount;
             
             displayFolderStructure(folderStructure);
             updateStep(2);
@@ -1495,16 +1600,20 @@ Este archivo fue generado automáticamente. Su contenido puede ser editado segú
                     const icon = item.type === 'folder' ? 'fa-folder' : 'fa-file';
                     const hasContent = item.type === 'file' && item.content && item.content.trim() !== '';
                     const contentIndicator = hasContent ? ' <span style="color: var(--success); font-size: 0.7rem;">✓</span>' : '';
+                    const normalizedIndicator = item.wasNormalized ? ' <span style="color: var(--warning); font-size: 0.7rem;">↴</span>' : '';
                     
-                    itemElement.innerHTML = `<i class="fas ${icon}"></i> ${item.name}${item.type === 'folder' ? '/' : ''}${contentIndicator}`;
+                    itemElement.innerHTML = `<i class="fas ${icon}"></i> ${item.name}${item.type === 'folder' ? '/' : ''}${contentIndicator}${normalizedIndicator}`;
                     
                     // Hacer clic para ver contenido
                     if (item.type === 'file' && hasContent) {
                         itemElement.style.cursor = 'pointer';
-                        itemElement.title = 'Click para ver contenido';
+                        itemElement.title = item.wasNormalized ? `Click para ver contenido (Original: ${item.originalName})` : 'Click para ver contenido';
                         itemElement.addEventListener('click', () => {
                             showContentPreview(item.path, item.content);
                         });
+                    } else if (item.wasNormalized) {
+                        itemElement.title = `Nombre original: ${item.originalName}`;
+                        itemElement.style.color = 'var(--warning)';
                     }
                     
                     container.appendChild(itemElement);
@@ -1646,7 +1755,7 @@ Este archivo fue generado automáticamente. Su contenido puede ser editado segú
             }
         }
         
-        // =========== FLUJO PRINCIPAL CON CONTENIDO PRESERVADO ===========
+        // =========== FLUJO PRINCIPAL CON NOMBRES NORMALIZADOS ===========
         async function publishToGitHub() {
             if (!folderStructure || folderStructure.length === 0) {
                 alert('Primero selecciona una carpeta o crea una estructura manual.');
@@ -1670,7 +1779,7 @@ Este archivo fue generado automáticamente. Su contenido puede ser editado segú
             document.getElementById('progressBar').classList.remove('hidden');
             updateProgress(0);
             
-            logToConsole(`=== INICIANDO PUBLICACIÓN CON CONTENIDO PRESERVADO ===`, 'info');
+            logToConsole(`=== INICIANDO PUBLICACIÓN CON NOMBRES NORMALIZADOS ===`, 'info');
             logToConsole(`Repositorio: ${githubOwner}/${githubRepo}`, 'info');
             updateStep(4);
             
@@ -1685,14 +1794,14 @@ Este archivo fue generado automáticamente. Su contenido puede ser editado segú
                 const mainSha = await ensureMainBranch();
                 updateProgress(40);
                 
-                // PASO 3: Crear árbol Git con CONTENIDO REAL (60%)
-                logToConsole('3. Creando estructura con contenido real...', 'info');
+                // PASO 3: Crear árbol Git con nombres normalizados (60%)
+                logToConsole('3. Creando estructura con nombres normalizados...', 'info');
                 const treeSha = await createRootTreeWithContent(mainSha);
                 updateProgress(60);
                 
                 // PASO 4: Crear commit (80%)
                 logToConsole('4. Creando commit con la estructura...', 'info');
-                const commitSha = await createCommit(treeSha, mainSha, '🚀 Contenido publicado con PortalHub Creator v1.2');
+                const commitSha = await createCommit(treeSha, mainSha, '🚀 Contenido publicado con PortalHub Creator v1.3 (nombres normalizados)');
                 updateProgress(80);
                 
                 // PASO 5: Actualizar rama main (100%)
@@ -1701,19 +1810,19 @@ Este archivo fue generado automáticamente. Su contenido puede ser editado segú
                 updateProgress(100);
                 
                 // =========== PUBLICACIÓN COMPLETADA CON ÉXITO ===========
-                logToConsole('=== PUBLICACIÓN CON CONTENIDO COMPLETADA ===', 'success');
+                logToConsole('=== PUBLICACIÓN CON NOMBRES NORMALIZADOS COMPLETADA ===', 'success');
                 logToConsole('Flujo GitHub ejecutado correctamente:', 'success');
                 logToConsole('  ✓ Repositorio verificado/creado', 'success');
                 logToConsole('  ✓ Rama main inicializada', 'success');
-                logToConsole('  ✓ Árbol Git creado con CONTENIDO REAL', 'success');
+                logToConsole('  ✓ Árbol Git creado con NOMBRES NORMALIZADOS', 'success');
                 logToConsole('  ✓ Commit creado', 'success');
                 logToConsole('  ✓ Rama main actualizada', 'success');
                 logToConsole('', 'info');
                 logToConsole('🔗 Repositorio disponible en:', 'info');
                 logToConsole(`https://github.com/${githubOwner}/${githubRepo}`, 'info');
                 logToConsole('', 'info');
-                logToConsole('✅ El contenido de los archivos se ha preservado completamente.', 'success');
-                logToConsole('   Todo el código y configuración se exportaron tal cual.', 'success');
+                logToConsole('✅ Todos los nombres de archivo se normalizaron a minúsculas.', 'success');
+                logToConsole('   Compatibilidad web óptima: "Gmail.html" → "gmail.html", "MiArchivo.js" → "miarchivo.js"', 'success');
                 
                 // Mostrar alerta de éxito FINAL
                 showFinalSuccessAlert();
@@ -1756,7 +1865,7 @@ Este archivo fue generado automáticamente. Su contenido puede ser editado segú
                         },
                         body: JSON.stringify({
                             name: githubRepo,
-                            description: 'Repositorio creado automáticamente por PortalHub Creator v1.2',
+                            description: 'Repositorio creado automáticamente por PortalHub Creator v1.3',
                             private: false,
                             auto_init: false
                         })
@@ -1811,7 +1920,7 @@ Este archivo fue generado automáticamente. Su contenido puede ser editado segú
         // Inicializar repositorio vacío
         async function bootstrapRepository() {
             try {
-                const readmeContent = `# ${githubRepo}\n\nRepositorio creado automáticamente por PortalHub Creator v1.2.\nEl contenido de los archivos se preserva completamente.\n`;
+                const readmeContent = `# ${githubRepo}\n\nRepositorio creado automáticamente por PortalHub Creator v1.3.\nLos nombres de archivo se normalizan automáticamente a minúsculas para compatibilidad web.\n`;
                 
                 const blobResponse = await fetch(`https://api.github.com/repos/${githubOwner}/${githubRepo}/git/blobs`, {
                     method: 'POST',
@@ -1843,7 +1952,7 @@ Este archivo fue generado automáticamente. Su contenido puede ser editado segú
                     },
                     body: JSON.stringify({
                         tree: [{
-                            path: 'README.md',
+                            path: 'readme.md',
                             mode: '100644',
                             type: 'blob',
                             sha: readmeBlobSha
@@ -1867,7 +1976,7 @@ Este archivo fue generado automáticamente. Su contenido puede ser editado segú
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        message: 'Initial commit - PortalHub Creator v1.2',
+                        message: 'Initial commit - PortalHub Creator v1.3 (nombres normalizados)',
                         tree: treeSha,
                         parents: []
                     })
@@ -1907,7 +2016,7 @@ Este archivo fue generado automáticamente. Su contenido puede ser editado segú
             }
         }
         
-        // FUNCIÓN CRÍTICA: Crear árbol Git con CONTENIDO REAL
+        // FUNCIÓN CRÍTICA: Crear árbol Git con nombres normalizados
         async function createRootTreeWithContent(baseTreeSha) {
             try {
                 // PASO 1: Recolectar TODOS los archivos con su contenido
@@ -1927,7 +2036,9 @@ Este archivo fue generado automáticamente. Su contenido puede ser editado segú
                             files.push({
                                 path: filePath,
                                 name: cleanName,
-                                content: item.content || createDefaultContent(cleanName)
+                                content: item.content || createDefaultContent(cleanName),
+                                wasNormalized: item.wasNormalized || false,
+                                originalName: item.originalName || cleanName
                             });
                         }
                     });
@@ -1939,18 +2050,13 @@ Este archivo fue generado automáticamente. Su contenido puede ser editado segú
                     throw new Error('No se encontraron archivos en la estructura');
                 }
                 
-                logToConsole(`Creando ${files.length} archivos con contenido real...`, 'info');
+                const normalizedCount = files.filter(f => f.wasNormalized).length;
+                logToConsole(`Creando ${files.length} archivos (${normalizedCount} nombres normalizados)...`, 'info');
                 
-                // PASO 2: Construir entradas del árbol Git con contenido
+                // PASO 2: Construir entradas del árbol Git con nombres normalizados
                 const treeItems = files.map(file => {
-                    // Normalizar path
-                    let normalizedPath = file.path
-                        .replace(/\\/g, '/')
-                        .replace(/\/+/g, '/')
-                        .replace(/^\/+/, '')
-                        .replace(/\/+$/, '');
-                    
-                    const finalPath = normalizedPath;
+                    // El path ya está normalizado desde el procesamiento anterior
+                    const finalPath = file.path;
                     
                     // Obtener contenido real
                     let content = file.content || '';
@@ -1985,6 +2091,13 @@ Este archivo fue generado automáticamente. Su contenido puede ser editado segú
                     if (!entry.path || entry.path.trim() === '') {
                         throw new Error(`Entrada ${i}: path está vacío`);
                     }
+                    
+                    // Verificar que el nombre esté en minúsculas
+                    const fileName = entry.path.split('/').pop();
+                    if (fileName !== fileName.toLowerCase()) {
+                        logToConsole(`Advertencia: ${entry.path} no está completamente en minúsculas, normalizando...`, 'warning');
+                        entry.path = normalizePath(entry.path);
+                    }
                 }
                 
                 // PASO 4: Enviar a GitHub
@@ -2013,7 +2126,7 @@ Este archivo fue generado automáticamente. Su contenido puede ser editado segú
                 
                 const treeData = await treeResponse.json();
                 logToConsole(`✓ Árbol Git creado: ${treeData.sha.substring(0, 8)}`, 'success');
-                logToConsole(`✓ Archivos con contenido real: ${files.length}`, 'success');
+                logToConsole(`✓ Archivos con nombres normalizados: ${normalizedCount}/${files.length}`, 'success');
                 
                 return treeData.sha;
                 
@@ -2098,9 +2211,9 @@ Este archivo fue generado automáticamente. Su contenido puede ser editado segú
             successAlert.innerHTML = `
                 <i class="fas fa-check-circle"></i>
                 <div>
-                    <strong>¡Publicación exitosa con contenido preservado!</strong><br>
-                    Todos los archivos mantienen su contenido original.<br>
-                    <small>El código, configuraciones y "magia" se exportaron completamente.</small>
+                    <strong>¡Publicación exitosa con nombres normalizados!</strong><br>
+                    Todos los archivos se publicaron en minúsculas para máxima compatibilidad web.<br>
+                    <small>Ejemplo: "Gmail.html" → "gmail.html", "MiArchivo.js" → "miarchivo.js"</small>
                     <br><br>
                     <a href="https://github.com/${githubOwner}/${githubRepo}" target="_blank" class="btn" style="margin-top: 10px;">
                         <i class="fab fa-github"></i> Ver repositorio en GitHub
