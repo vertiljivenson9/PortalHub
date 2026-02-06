@@ -1718,63 +1718,92 @@ package.json"></textarea>
         }
         
         // Crear commit
-        async function createCommit(treeSha, parentSha, message) {
-            try {
-                const commitResponse = await fetch(`https://api.github.com/repos/${githubOwner}/${githubRepo}/git/commits`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `token ${githubToken}`,
-                        'Accept': 'application/vnd.github.v3+json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        message: message,
-                        tree: treeSha,
-                        parents: [parentSha]
-                    })
-                });
+        async function createPortalHubTree(baseTreeSha) {
+    try {
+        const treeItems = [];
+        
+        // Función recursiva para agregar SOLO archivos (no carpetas)
+        function addFilesToTree(items, basePath = 'portalHub') {
+            items.forEach(item => {
+                const itemPath = basePath ? `${basePath}/${item.name}` : item.name;
                 
-                if (!commitResponse.ok) {
-                    const errorData = await commitResponse.json();
-                    throw new Error(`Error creando commit: ${commitResponse.status} - ${errorData.message || commitResponse.statusText}`);
+                if (item.type === 'folder') {
+                    // ❌ NO agregar carpetas al árbol - Git las crea automáticamente
+                    // Solo procesar hijos recursivamente
+                    if (item.children && item.children.length > 0) {
+                        addFilesToTree(item.children, itemPath);
+                    }
+                } else {
+                    // ✅ SOLO archivos: usar SOLO 'content', NUNCA 'sha'
+                    treeItems.push({
+                        path: itemPath,
+                        mode: '100644',
+                        type: 'blob',
+                        content: '' // Archivo vacío
+                    });
                 }
-                
-                const commitData = await commitResponse.json();
-                logToConsole(`Commit creado: ${commitData.sha.substring(0, 8)}`, 'success');
-                return commitData.sha;
-                
-            } catch (error) {
-                throw new Error(`Error en createCommit: ${error.message}`);
-            }
+            });
         }
         
-        // Actualizar rama main
-        async function updateMainBranch(commitSha) {
-            try {
-                const refResponse = await fetch(`https://api.github.com/repos/${githubOwner}/${githubRepo}/git/refs/heads/main`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Authorization': `token ${githubToken}`,
-                        'Accept': 'application/vnd.github.v3+json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        sha: commitSha,
-                        force: false
-                    })
-                });
-                
-                if (!refResponse.ok) {
-                    const errorData = await refResponse.json();
-                    throw new Error(`Error actualizando rama main: ${refResponse.status} - ${errorData.message || refResponse.statusText}`);
-                }
-                
-                logToConsole('Rama main actualizada correctamente.', 'success');
-                
-            } catch (error) {
-                throw new Error(`Error en updateMainBranch: ${error.message}`);
-            }
+        addFilesToTree(folderStructure);
+        
+        // Validación: asegurar que hay elementos
+        if (treeItems.length === 0) {
+            throw new Error('No hay archivos para crear en el árbol');
         }
+        
+        // Validación: verificar que ninguna entrada tenga sha o esté incompleta
+        const invalidItems = treeItems.filter(item => 
+            !item.path || 
+            item.sha || // ❌ No debe tener sha
+            !item.content // Debe tener content (aunque sea vacío)
+        );
+        
+        if (invalidItems.length > 0) {
+            console.error('Items inválidos:', invalidItems);
+            throw new Error(`Hay ${invalidItems.length} entradas inválidas en el árbol`);
+        }
+        
+        logToConsole(`Creando árbol con ${treeItems.length} archivos...`, 'info');
+        
+        // Debug: mostrar exactamente qué se envía
+        console.log('Payload enviado a GitHub:', JSON.stringify({
+            tree: treeItems,
+            base_tree: baseTreeSha
+        }, null, 2));
+        
+        const treeResponse = await fetch(
+            `https://api.github.com/repos/${githubOwner}/${githubRepo}/git/trees`, 
+            {
+                method: 'POST',
+                headers: {
+                    'Authorization': `token ${githubToken}`,
+                    'Accept': 'application/vnd.github+json',
+                    'Content-Type': 'application/json',
+                    'X-GitHub-Api-Version': '2022-11-28'
+                },
+                body: JSON.stringify({
+                    tree: treeItems,
+                    base_tree: baseTreeSha
+                })
+            }
+        );
+        
+        if (!treeResponse.ok) {
+            const errorText = await treeResponse.text();
+            logToConsole(`Error API GitHub: ${treeResponse.status}`, 'error');
+            logToConsole(`Respuesta: ${errorText}`, 'error');
+            throw new Error(`Error ${treeResponse.status}: ${errorText}`);
+        }
+        
+        const treeData = await treeResponse.json();
+        logToConsole(`Árbol creado: ${treeData.sha.substring(0, 8)}`, 'success');
+        return treeData.sha;
+        
+    } catch (error) {
+        throw new Error(`Error en createPortalHubTree: ${error.message}`);
+    }
+}
         
         // Actualizar barra de progreso
         function updateProgress(percent) {
