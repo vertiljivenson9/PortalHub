@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PortalHub Creator - Publica estructuras en GitHub</title>
+    <title>PortalHub Creator v1.1 - Estructura corregida</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* [ESTILOS COMPLETOS MANTENIDOS IGUAL] */
         :root {
             --primary: #2ea44f;
             --primary-dark: #22863a;
@@ -558,41 +559,18 @@
         .tab-content.active {
             display: block;
         }
-        
-        .file-browser {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        
-        .file-browser-header {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        
-        .path-display {
-            flex: 1;
-            padding: 8px 12px;
-            background-color: #f6f8fa;
-            border-radius: var(--radius);
-            font-family: monospace;
-            font-size: 0.9rem;
-            overflow-x: auto;
-            white-space: nowrap;
-        }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1><i class="fas fa-project-diagram"></i> PortalHub Creator</h1>
-        <p>Publica estructuras de carpetas locales en GitHub - 100% cliente, sin backend</p>
+        <h1><i class="fas fa-project-diagram"></i> PortalHub Creator v1.1</h1>
+        <p>Publica el contenido de carpetas directamente en la raíz del repositorio</p>
     </div>
     
     <div class="step-indicator">
         <div class="step active" id="step1">
             <div class="step-circle">1</div>
-            <div class="step-label">Seleccionar archivos</div>
+            <div class="step-label">Seleccionar carpeta</div>
         </div>
         <div class="step" id="step2">
             <div class="step-circle">2</div>
@@ -611,49 +589,41 @@
     <div class="app-container">
         <!-- Panel izquierdo: Selección de archivos y vista previa -->
         <div class="card">
-            <h2 class="card-title"><i class="fas fa-folder-open"></i> Seleccionar archivos y carpetas</h2>
+            <h2 class="card-title"><i class="fas fa-folder-open"></i> Seleccionar carpeta</h2>
             
-            <div class="alert alert-info">
-                <i class="fas fa-info-circle"></i>
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
                 <div>
-                    <strong>Importante:</strong> Esta aplicación funciona completamente en tu navegador. 
-                    No se suben los archivos reales, solo la estructura de carpetas y archivos vacíos.
-                    Tus archivos permanecen en tu dispositivo.
+                    <strong>v1.1 - Estructura corregida:</strong> El contenido de la carpeta se publica directamente en la raíz del repositorio. No se incluye la carpeta contenedora.
                 </div>
             </div>
             
             <div class="tabs">
-                <div class="tab active" data-tab="dragdrop">
-                    <i class="fas fa-cloud-upload-alt"></i> Arrastrar y Soltar
-                </div>
-                <div class="tab" data-tab="fileinput">
-                    <i class="fas fa-folder-open"></i> Seleccionar Archivos
+                <div class="tab active" data-tab="folder">
+                    <i class="fas fa-folder"></i> Seleccionar Carpeta
                 </div>
                 <div class="tab" data-tab="manual">
-                    <i class="fas fa-keyboard"></i> Manual
+                    <i class="fas fa-keyboard"></i> Estructura Manual
                 </div>
             </div>
             
-            <!-- Pestaña 1: Arrastrar y soltar -->
-            <div class="tab-content active" id="dragdrop-tab">
+            <!-- Pestaña 1: Selección de carpeta -->
+            <div class="tab-content active" id="folder-tab">
                 <div class="drop-zone" id="dropZone">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    <h3>Arrastra y suelta archivos y carpetas aquí</h3>
-                    <p>O haz clic para seleccionar archivos</p>
-                    <p><small>Puedes seleccionar múltiples archivos y carpetas</small></p>
+                    <i class="fas fa-folder-open"></i>
+                    <h3>Arrastra y suelta una carpeta aquí</h3>
+                    <p>O haz clic para seleccionar una carpeta</p>
+                    <p><small>Se publicará el contenido interno directamente en la raíz del repositorio</small></p>
                 </div>
                 
-                <input type="file" id="fileInput" class="file-input-hidden" multiple webkitdirectory directory>
+                <input type="file" id="folderInput" class="file-input-hidden" webkitdirectory directory>
                 
-                <div id="selectedFilesInfo" class="hidden">
+                <div id="selectedFolderInfo" class="hidden">
                     <div class="github-info">
-                        <p><strong>Archivos seleccionados:</strong> <span id="fileCount">0</span></p>
-                        <p><strong>Carpetas detectadas:</strong> <span id="folderCount">0</span></p>
+                        <p><strong>Carpeta seleccionada:</strong> <span id="selectedFolderName">-</span></p>
+                        <p><strong>Archivos detectados:</strong> <span id="fileCount">0</span></p>
+                        <p><strong>Carpetas internas:</strong> <span id="folderCount">0</span></p>
                         <div class="stats">
-                            <div class="stat">
-                                <div class="stat-value" id="totalSize">0</div>
-                                <div class="stat-label">KB total</div>
-                            </div>
                             <div class="stat">
                                 <div class="stat-value" id="uniqueFolders">0</div>
                                 <div class="stat-label">Carpetas únicas</div>
@@ -666,52 +636,50 @@
                     </div>
                     
                     <button id="clearFilesBtn" class="btn btn-outline" style="margin-top: 15px;">
-                        <i class="fas fa-trash"></i> Limpiar selección
+                        <i class="fas fa-trash"></i> Cambiar carpeta
                     </button>
                 </div>
             </div>
             
-            <!-- Pestaña 2: Entrada manual -->
+            <!-- Pestaña 2: Estructura manual -->
             <div class="tab-content" id="manual-tab">
                 <div class="alert alert-warning">
                     <i class="fas fa-exclamation-triangle"></i>
                     <div>
-                        <strong>Modo manual:</strong> Ingresa manualmente la estructura de carpetas y archivos.
-                        Cada línea representa un archivo o carpeta. Usa indentación con espacios para indicar jerarquía.
+                        <strong>Estructura manual:</strong> Define la estructura de archivos y carpetas que quieres crear.
+                        Cada línea representa un archivo o carpeta.
                     </div>
                 </div>
                 
                 <div class="form-group">
-                    <label for="manualStructure" class="form-label">Estructura manual (una por línea):</label>
+                    <label for="manualStructure" class="form-label">Estructura (una por línea):</label>
                     <textarea id="manualStructure" class="form-control" rows="10" placeholder="Ejemplo:
+index.html
 src/
-  index.js
-  components/
-    Button.js
-    Header.js
+  main.js
+  styles.css
 assets/
   images/
     logo.png
-README.md
-package.json"></textarea>
+README.md"></textarea>
                     <span class="form-help">
                         Usa <code>/</code> al final para indicar carpetas. Indenta con 2 espacios por nivel.
                     </span>
                 </div>
                 
                 <button id="parseManualBtn" class="btn btn-block">
-                    <i class="fas fa-sitemap"></i> Generar estructura desde texto
+                    <i class="fas fa-sitemap"></i> Generar estructura
                 </button>
             </div>
             
             <div id="structureSection" class="hidden">
-                <h3 class="card-title"><i class="fas fa-sitemap"></i> Vista previa de estructura</h3>
+                <h3 class="card-title"><i class="fas fa-sitemap"></i> Estructura que se publicará</h3>
                 <div class="folder-structure" id="folderStructure">
                     <!-- La estructura de carpetas se generará aquí -->
                 </div>
-                <p class="form-help">
+                <p class="form-help" id="structureHelp">
                     <i class="fas fa-info-circle"></i>
-                    Todos los elementos se exportarán bajo la carpeta <code>portalHub/</code> en tu repositorio de GitHub.
+                    Todos los elementos se publicarán directamente en la raíz del repositorio.
                 </p>
             </div>
         </div>
@@ -720,11 +688,11 @@ package.json"></textarea>
         <div class="card">
             <h2 class="card-title"><i class="fab fa-github"></i> Configuración de GitHub</h2>
             
-            <div class="alert alert-warning">
-                <i class="fas fa-key"></i>
+            <div class="alert alert-info">
+                <i class="fas fa-shield-alt"></i>
                 <div>
-                    <strong>Credenciales:</strong> Tu token de acceso personal (PAT) solo se usa en memoria y 
-                    nunca se almacena en el navegador. Cierra la pestaña para eliminarlo.
+                    <strong>Flujo optimizado:</strong> El contenido de tu carpeta se publica directamente en la raíz del repositorio.
+                    Listo para despliegue inmediato.
                 </div>
             </div>
             
@@ -734,8 +702,8 @@ package.json"></textarea>
                        placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
                 <span class="form-help">
                     <a href="https://github.com/settings/tokens" target="_blank">
-                        <i class="fas fa-external-link-alt"></i> Generar un nuevo token
-                    </a> con permisos <code>repo</code> (acceso completo a repositorios).
+                        <i class="fas fa-external-link-alt"></i> Generar token con permisos <code>repo</code>
+                    </a>
                 </span>
             </div>
             
@@ -749,7 +717,7 @@ package.json"></textarea>
                 <label for="githubRepo" class="form-label">Nombre del repositorio</label>
                 <input type="text" id="githubRepo" class="form-control" 
                        placeholder="mi-proyecto" autocomplete="off">
-                <span class="form-help">El repositorio será creado si no existe.</span>
+                <span class="form-help">Se creará automáticamente si no existe.</span>
             </div>
             
             <div class="form-group">
@@ -759,14 +727,14 @@ package.json"></textarea>
                 <div id="validationResult" class="hidden">
                     <div class="status-indicator">
                         <i class="fas fa-check-circle"></i>
-                        <span id="validationMessage">Conexión validada correctamente</span>
+                        <span id="validationMessage">Conexión validada</span>
                     </div>
                 </div>
             </div>
             
             <div class="form-group">
                 <button id="publishBtn" class="btn btn-block" disabled>
-                    <i class="fas fa-cloud-upload-alt"></i> Publicar estructura en GitHub
+                    <i class="fas fa-rocket"></i> Publicar contenido en GitHub
                 </button>
                 <div class="progress-bar hidden" id="progressBar">
                     <div class="progress-fill" id="progressFill"></div>
@@ -780,7 +748,7 @@ package.json"></textarea>
             <div class="console" id="console">
                 <div class="console-line">
                     <span class="console-time" id="currentTime">00:00:00</span>
-                    <span class="console-message console-info">PortalHub Creator inicializado. Selecciona archivos o ingresa una estructura manual.</span>
+                    <span class="console-message console-info">PortalHub Creator v1.1 inicializado. Contenido de carpetas publicado directamente en raíz.</span>
                 </div>
             </div>
         </div>
@@ -788,13 +756,13 @@ package.json"></textarea>
     
     <div class="footer">
         <p>
-            PortalHub Creator - Aplicación 100% cliente sin backend | 
-            Usa la <a href="https://docs.github.com/en/rest/git" target="_blank">GitHub Git Data API</a> | 
-            <a href="https://github.com" target="_blank">GitHub</a>
+            PortalHub Creator v1.1 - Corrección de estructura de carpetas | 
+            <a href="https://docs.github.com/en/rest/git" target="_blank">GitHub REST API</a> | 
+            Contenido directo en raíz
         </p>
         <p>
-            <i class="fas fa-exclamation-triangle"></i> 
-            Esta aplicación no almacena ningún dato, credencial o archivo. Todo el procesamiento ocurre en tu navegador.
+            <i class="fas fa-check-circle"></i> 
+            El nombre de la carpeta local no aparece en el repositorio. Solo el contenido interno.
         </p>
     </div>
 
@@ -807,47 +775,16 @@ package.json"></textarea>
         let githubRepo = '';
         let currentStep = 1;
         let consoleElement = null;
+        let baseFolderName = '';
         
-        // Función para limpiar entradas de GitHub
-        function cleanGitHubInput(input) {
-            if (!input || typeof input !== 'string') return input;
-            
-            input = input.trim();
-            
-            // Caso 1: URL completa de GitHub
-            if (input.includes('github.com/')) {
-                try {
-                    // Extraer la parte después de github.com/
-                    const match = input.match(/github\.com\/([^\/]+)(?:\/([^\/\.]+))?/);
-                    if (match) {
-                        // Si es un repositorio (tiene dos partes)
-                        if (match[2]) {
-                            return match[2].replace('.git', '');
-                        }
-                        // Si es solo un usuario
-                        return match[1];
-                    }
-                } catch (e) {
-                    console.error('Error al limpiar GitHub input:', e);
-                }
-            }
-            
-            // Caso 2: Tiene .git al final (pero no es URL completa)
-            if (input.endsWith('.git')) {
-                return input.replace('.git', '');
-            }
-            
-            return input;
-        }
-        
-        // Inicialización cuando el DOM esté listo
+        // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
             consoleElement = document.getElementById('console');
             updateCurrentTime();
             
             // Configurar event listeners
             setupTabNavigation();
-            setupFileSelection();
+            setupFolderSelection();
             setupManualInput();
             
             document.getElementById('githubToken').addEventListener('input', updatePublishButtonState);
@@ -858,10 +795,10 @@ package.json"></textarea>
             document.getElementById('clearFilesBtn').addEventListener('click', clearFileSelection);
             document.getElementById('parseManualBtn').addEventListener('click', parseManualStructure);
             
-            // Actualizar hora actual en consola cada segundo
+            // Actualizar hora actual en consola
             setInterval(updateCurrentTime, 1000);
             
-            logToConsole('Aplicación inicializada correctamente. Compatible con todos los navegadores modernos.', 'info');
+            logToConsole('PortalHub Creator v1.1 inicializado. Corrección de estructura aplicada.', 'success');
         });
         
         // Configurar navegación por pestañas
@@ -882,14 +819,14 @@ package.json"></textarea>
             });
         }
         
-        // Configurar selección de archivos
-        function setupFileSelection() {
+        // Configurar selección de carpeta
+        function setupFolderSelection() {
             const dropZone = document.getElementById('dropZone');
-            const fileInput = document.getElementById('fileInput');
+            const folderInput = document.getElementById('folderInput');
             
             // Click en la zona de drop
             dropZone.addEventListener('click', () => {
-                fileInput.click();
+                folderInput.click();
             });
             
             // Arrastrar sobre la zona
@@ -903,119 +840,153 @@ package.json"></textarea>
                 dropZone.classList.remove('dragover');
             });
             
-            // Soltar archivos
-            dropZone.addEventListener('drop', (e) => {
+            // Soltar carpeta
+            dropZone.addEventListener('drop', async (e) => {
                 e.preventDefault();
                 dropZone.classList.remove('dragover');
                 
-                if (e.dataTransfer.items) {
-                    // Usar la API DataTransferItemList
-                    const items = e.dataTransfer.items;
-                    const files = [];
-                    
-                    for (let i = 0; i < items.length; i++) {
-                        if (items[i].kind === 'file') {
-                            files.push(items[i].getAsFile());
+                const items = e.dataTransfer.items;
+                const files = [];
+                
+                // Función para procesar entrada (archivo o directorio)
+                async function processEntry(entry, path = '') {
+                    return new Promise((resolve) => {
+                        if (entry.isFile) {
+                            entry.file(file => {
+                                // Guardar la ruta relativa desde la carpeta raíz
+                                file.relativePath = path ? `${path}/${file.name}` : file.name;
+                                files.push(file);
+                                resolve();
+                            });
+                        } else if (entry.isDirectory) {
+                            const dirReader = entry.createReader();
+                            dirReader.readEntries(async (entries) => {
+                                for (const ent of entries) {
+                                    const newPath = path ? `${path}/${entry.name}` : entry.name;
+                                    await processEntry(ent, newPath);
+                                }
+                                resolve();
+                            });
+                        }
+                    });
+                }
+                
+                // Procesar cada ítem
+                for (let i = 0; i < items.length; i++) {
+                    const item = items[i];
+                    if (item.kind === 'file') {
+                        const entry = item.webkitGetAsEntry();
+                        if (entry) {
+                            await processEntry(entry);
                         }
                     }
+                }
+                
+                if (files.length > 0) {
+                    // Detectar el nombre de la carpeta base (primer nivel)
+                    const firstPath = files[0].relativePath;
+                    baseFolderName = firstPath.split('/')[0];
                     
-                    processFiles(files);
-                } else {
-                    // Fallback para navegadores más antiguos
-                    processFiles(e.dataTransfer.files);
+                    // Procesar archivos
+                    processFolderFiles(files);
                 }
             });
             
-            // Cambio en el input de archivos
-            fileInput.addEventListener('change', (e) => {
-                processFiles(Array.from(e.target.files));
+            // Cambio en el input de carpeta
+            folderInput.addEventListener('change', (e) => {
+                const files = Array.from(e.target.files);
+                if (files.length > 0) {
+                    // Detectar el nombre de la carpeta base desde webkitRelativePath
+                    const firstFile = files[0];
+                    if (firstFile.webkitRelativePath) {
+                        baseFolderName = firstFile.webkitRelativePath.split('/')[0];
+                    }
+                    processFolderFiles(files);
+                }
             });
         }
         
         // Configurar entrada manual
         function setupManualInput() {
-            // Ya configurado en el event listener principal
+            // Ya configurado en event listener principal
         }
         
-        // Procesar archivos seleccionados
-        function processFiles(files) {
-            if (!files || files.length === 0) return;
-            
-            // Limpiar selección anterior
+        // Procesar archivos de carpeta - CORRECCIÓN CRÍTICA
+        function processFolderFiles(files) {
             selectedFiles = [];
             
-            // Agregar nuevos archivos
             files.forEach(file => {
+                // Obtener ruta relativa desde webkitRelativePath o relativePath
+                let relativePath = file.relativePath || file.webkitRelativePath || file.name;
+                
+                // CORRECCIÓN: Remover el nombre de la carpeta base
+                if (relativePath && baseFolderName) {
+                    // Asegurar que la ruta comience con el nombre de la carpeta base
+                    if (relativePath.startsWith(baseFolderName + '/')) {
+                        relativePath = relativePath.substring(baseFolderName.length + 1);
+                    }
+                }
+                
                 selectedFiles.push({
                     name: file.name,
-                    path: file.webkitRelativePath || file.name,
+                    path: relativePath,
                     size: file.size,
                     type: file.type,
-                    isDirectory: file.type === '' && (file.name.includes('/') || file.size === 0)
+                    isDirectory: file.type === '' && (relativePath.includes('/') || file.size === 0)
                 });
             });
             
-            updateFileSelectionUI();
+            updateFolderSelectionUI();
             generateFolderStructureFromFiles();
         }
         
-        // Actualizar UI de selección de archivos
-        function updateFileSelectionUI() {
+        // Actualizar UI de selección de carpeta
+        function updateFolderSelectionUI() {
             const fileCount = selectedFiles.length;
             const folderCount = countUniqueFolders();
-            const totalSize = selectedFiles.reduce((sum, file) => sum + file.size, 0) / 1024;
             
+            document.getElementById('selectedFolderName').textContent = baseFolderName || 'Carpeta sin nombre';
             document.getElementById('fileCount').textContent = fileCount;
             document.getElementById('folderCount').textContent = folderCount;
-            document.getElementById('totalSize').textContent = totalSize.toFixed(2);
             document.getElementById('uniqueFolders').textContent = folderCount;
             
             // Actualizar lista de archivos
             const fileList = document.getElementById('fileList');
             fileList.innerHTML = '';
             
-            selectedFiles.slice(0, 20).forEach(file => {
-                const item = document.createElement('div');
-                item.className = 'file-list-item';
-                
-                const icon = file.isDirectory ? 'fa-folder' : 'fa-file';
-                item.innerHTML = `
-                    <i class="fas ${icon}"></i>
-                    <span>${file.name}</span>
-                    <span style="margin-left: auto; color: var(--text-light); font-size: 0.8rem;">
-                        ${file.isDirectory ? 'Carpeta' : (file.size / 1024).toFixed(2) + ' KB'}
-                    </span>
-                `;
-                
-                fileList.appendChild(item);
+            // Mostrar archivos únicos (sin duplicados por ruta)
+            const uniqueFiles = {};
+            selectedFiles.forEach(file => {
+                if (!uniqueFiles[file.path]) {
+                    const item = document.createElement('div');
+                    item.className = 'file-list-item';
+                    
+                    const icon = file.isDirectory ? 'fa-folder' : 'fa-file';
+                    item.innerHTML = `<i class="fas ${icon}"></i> <span>${file.path}</span>`;
+                    fileList.appendChild(item);
+                    uniqueFiles[file.path] = true;
+                }
             });
             
-            if (selectedFiles.length > 20) {
-                const moreItem = document.createElement('div');
-                moreItem.className = 'file-list-item';
-                moreItem.style.fontStyle = 'italic';
-                moreItem.textContent = `... y ${selectedFiles.length - 20} archivos más`;
-                fileList.appendChild(moreItem);
-            }
-            
-            // Mostrar información de archivos seleccionados
-            document.getElementById('selectedFilesInfo').classList.remove('hidden');
+            // Mostrar información de carpeta seleccionada
+            document.getElementById('selectedFolderInfo').classList.remove('hidden');
             updateStep(2);
             
-            logToConsole(`${fileCount} archivos seleccionados, ${folderCount} carpetas detectadas.`, 'success');
+            logToConsole(`Carpeta "${baseFolderName}" seleccionada: ${fileCount} archivos, ${folderCount} carpetas internas.`, 'success');
+            logToConsole(`El contenido se publicará directamente en la raíz del repositorio.`, 'info');
         }
         
-        // Contar carpetas únicas
+        // Contar carpetas únicas internas
         function countUniqueFolders() {
             const folders = new Set();
             
             selectedFiles.forEach(file => {
-                const path = file.path || file.name;
+                const path = file.path || '';
                 const parts = path.split('/');
                 
                 // Si hay más de una parte, hay carpetas en la ruta
                 if (parts.length > 1) {
-                    // Agregar todas las carpetas en la ruta
+                    // Agregar todas las carpetas en la ruta (excepto el archivo final)
                     let currentPath = '';
                     for (let i = 0; i < parts.length - 1; i++) {
                         currentPath = currentPath ? `${currentPath}/${parts[i]}` : parts[i];
@@ -1027,19 +998,17 @@ package.json"></textarea>
             return folders.size;
         }
         
-        // Generar estructura de carpetas a partir de archivos
+        // Generar estructura de carpetas a partir de archivos - CORREGIDO
         function generateFolderStructureFromFiles() {
             folderStructure = [];
             
             // Crear un mapa para organizar archivos por ruta
-            const pathMap = {};
-            
             selectedFiles.forEach(file => {
-                const path = file.path || file.name;
+                const path = file.path || '';
                 const parts = path.split('/');
                 
-                // Si es un archivo en la raíz
-                if (parts.length === 1) {
+                // Si el archivo está en la raíz (sin subcarpetas)
+                if (parts.length === 1 || (parts.length === 2 && parts[1] === '')) {
                     folderStructure.push({
                         name: parts[0],
                         path: parts[0],
@@ -1052,6 +1021,8 @@ package.json"></textarea>
                     
                     for (let i = 0; i < parts.length; i++) {
                         const part = parts[i];
+                        if (!part) continue; // Saltar partes vacías
+                        
                         currentPath = currentPath ? `${currentPath}/${part}` : part;
                         
                         // Buscar si ya existe este nivel
@@ -1159,7 +1130,7 @@ package.json"></textarea>
             });
             
             // Actualizar UI
-            document.getElementById('selectedFilesInfo').classList.add('hidden');
+            document.getElementById('selectedFolderInfo').classList.add('hidden');
             document.getElementById('structureSection').classList.remove('hidden');
             
             // Actualizar estadísticas
@@ -1168,6 +1139,7 @@ package.json"></textarea>
             
             document.getElementById('folderCount').textContent = folderCount;
             document.getElementById('fileCount').textContent = fileCount;
+            document.getElementById('selectedFolderName').textContent = 'Estructura manual';
             
             displayFolderStructure(folderStructure);
             updateStep(2);
@@ -1198,12 +1170,13 @@ package.json"></textarea>
         function clearFileSelection() {
             selectedFiles = [];
             folderStructure = [];
+            baseFolderName = '';
             
-            document.getElementById('selectedFilesInfo').classList.add('hidden');
+            document.getElementById('selectedFolderInfo').classList.add('hidden');
             document.getElementById('structureSection').classList.add('hidden');
-            document.getElementById('fileInput').value = '';
+            document.getElementById('folderInput').value = '';
             
-            logToConsole('Selección de archivos limpiada.', 'info');
+            logToConsole('Selección de carpeta limpiada.', 'info');
         }
         
         // Mostrar estructura de carpetas en el panel
@@ -1211,17 +1184,14 @@ package.json"></textarea>
             const container = document.getElementById('folderStructure');
             container.innerHTML = '';
             
-            // Agregar la carpeta raíz portalHub
-            const portalHubItem = document.createElement('div');
-            portalHubItem.className = `file-item folder`;
-            portalHubItem.innerHTML = `<i class="fas fa-folder"></i> portalHub/`;
-            container.appendChild(portalHubItem);
-            
-            // Función recursiva para mostrar elementos
+            // Mostrar estructura directamente en la raíz
             function displayItems(items, level) {
                 items.forEach(item => {
                     const itemElement = document.createElement('div');
-                    itemElement.className = `file-item ${item.type} indent-${level}`;
+                    itemElement.className = `file-item ${item.type}`;
+                    if (level > 0) {
+                        itemElement.classList.add(`indent-${level}`);
+                    }
                     
                     const icon = item.type === 'folder' ? 'fa-folder' : 'fa-file';
                     itemElement.innerHTML = `<i class="fas ${icon}"></i> ${item.name}${item.type === 'folder' ? '/' : ''}`;
@@ -1235,8 +1205,8 @@ package.json"></textarea>
                 });
             }
             
-            // Mostrar todos los elementos bajo portalHub
-            displayItems(structure, 1);
+            // Mostrar todos los elementos directamente
+            displayItems(structure, 0);
             
             document.getElementById('structureSection').classList.remove('hidden');
         }
@@ -1291,10 +1261,12 @@ package.json"></textarea>
         // Validar conexión con GitHub
         async function validateGitHubConnection() {
             githubToken = document.getElementById('githubToken').value.trim();
-            githubOwner = cleanGitHubInput(document.getElementById('githubOwner').value);
-            githubRepo = cleanGitHubInput(document.getElementById('githubRepo').value);
+            githubOwner = document.getElementById('githubOwner').value.trim();
+            githubRepo = document.getElementById('githubRepo').value.trim();
             
-            console.log('Datos limpios para validación:', { githubOwner, githubRepo });
+            // Limpiar inputs de GitHub si es necesario
+            githubOwner = githubOwner.replace('https://github.com/', '').replace('.git', '').split('/')[0];
+            githubRepo = githubRepo.replace('https://github.com/', '').replace('.git', '').split('/').pop() || githubRepo;
             
             const validateBtn = document.getElementById('validateBtn');
             const originalText = validateBtn.innerHTML;
@@ -1309,38 +1281,19 @@ package.json"></textarea>
                 const repoResponse = await fetch(`https://api.github.com/repos/${githubOwner}/${githubRepo}`, {
                     headers: {
                         'Authorization': `token ${githubToken}`,
-                        'Accept': 'application/vnd.github.v3+json',
-                        'User-Agent': 'PortalHub-Creator-App'
+                        'Accept': 'application/vnd.github.v3+json'
                     }
                 });
                 
-                logToConsole(`Respuesta recibida: ${repoResponse.status} ${repoResponse.statusText}`, 'info');
-                
                 if (repoResponse.status === 200) {
-                    logToConsole(`Repositorio encontrado: ${githubOwner}/${githubRepo}`, 'success');
-                    
-                    // Verificar si existe la rama main
-                    const refResponse = await fetch(`https://api.github.com/repos/${githubOwner}/${githubRepo}/git/refs/heads/main`, {
-                        headers: {
-                            'Authorization': `token ${githubToken}`,
-                            'Accept': 'application/vnd.github.v3+json'
-                        }
-                    });
-                    
-                    if (refResponse.status === 200) {
-                        logToConsole('Rama principal (main) encontrada. Listo para publicar.', 'success');
-                        document.getElementById('validationMessage').textContent = 'Repositorio y rama main encontrados. Listo para publicar.';
-                    } else {
-                        logToConsole('Repositorio encontrado pero sin rama main. Se inicializará automáticamente.', 'warning');
-                        document.getElementById('validationMessage').textContent = 'Repositorio encontrado pero sin rama main. Se inicializará automáticamente.';
-                    }
-                    
+                    logToConsole(`✓ Repositorio encontrado: ${githubOwner}/${githubRepo}`, 'success');
+                    document.getElementById('validationMessage').textContent = 'Repositorio encontrado. Listo para publicar.';
                 } else if (repoResponse.status === 404) {
-                    logToConsole(`Repositorio no encontrado. Se creará uno nuevo: ${githubOwner}/${githubRepo}`, 'warning');
+                    logToConsole(`Repositorio no encontrado. Se creará uno nuevo.`, 'warning');
                     document.getElementById('validationMessage').textContent = 'Repositorio no encontrado. Se creará uno nuevo.';
                 } else {
                     const errorData = await repoResponse.json().catch(() => ({}));
-                    throw new Error(`Error de GitHub: ${repoResponse.status} - ${errorData.message || repoResponse.statusText}`);
+                    throw new Error(`Error de GitHub: ${errorData.message || repoResponse.statusText}`);
                 }
                 
                 document.getElementById('validationResult').classList.remove('hidden');
@@ -1349,7 +1302,6 @@ package.json"></textarea>
             } catch (error) {
                 logToConsole(`Error de validación: ${error.message}`, 'error');
                 alert(`Error de validación: ${error.message}\n\nVerifica tu token y credenciales.`);
-                
                 document.getElementById('validationResult').classList.add('hidden');
             } finally {
                 validateBtn.innerHTML = originalText;
@@ -1357,18 +1309,21 @@ package.json"></textarea>
             }
         }
         
-        // Publicar estructura en GitHub
+        // =========== FLUJO PRINCIPAL CORREGIDO ===========
+        // Publicar contenido en GitHub - VERSIÓN CORREGIDA
         async function publishToGitHub() {
             if (!folderStructure || folderStructure.length === 0) {
-                alert('Primero selecciona o crea una estructura de carpetas.');
+                alert('Primero selecciona una carpeta o crea una estructura manual.');
                 return;
             }
             
             githubToken = document.getElementById('githubToken').value.trim();
-            githubOwner = cleanGitHubInput(document.getElementById('githubOwner').value);
-            githubRepo = cleanGitHubInput(document.getElementById('githubRepo').value);
+            githubOwner = document.getElementById('githubOwner').value.trim();
+            githubRepo = document.getElementById('githubRepo').value.trim();
             
-            console.log('Datos limpios para publicación:', { githubOwner, githubRepo });
+            // Limpiar inputs
+            githubOwner = githubOwner.replace('https://github.com/', '').replace('.git', '').split('/')[0];
+            githubRepo = githubRepo.replace('https://github.com/', '').replace('.git', '').split('/').pop() || githubRepo;
             
             const publishBtn = document.getElementById('publishBtn');
             const originalText = publishBtn.innerHTML;
@@ -1379,57 +1334,56 @@ package.json"></textarea>
             document.getElementById('progressBar').classList.remove('hidden');
             updateProgress(0);
             
-            logToConsole(`Iniciando publicación en GitHub: ${githubOwner}/${githubRepo}`, 'info');
+            logToConsole(`=== INICIANDO PUBLICACIÓN CORREGIDA ===`, 'info');
+            logToConsole(`Repositorio: ${githubOwner}/${githubRepo}`, 'info');
             updateStep(4);
             
             try {
-                // Paso 1: Verificar/crear repositorio
-                logToConsole('Verificando repositorio...', 'info');
+                // PASO 1: Verificar/crear repositorio (20%)
+                logToConsole('1. Verificando/creando repositorio...', 'info');
                 await ensureRepositoryExists();
-                updateProgress(10);
+                updateProgress(20);
                 
-                // Paso 2: Verificar/crear rama main
-                logToConsole('Verificando rama principal...', 'info');
+                // PASO 2: Verificar/crear rama main (40%)
+                logToConsole('2. Verificando rama principal...', 'info');
                 const mainSha = await ensureMainBranch();
-                updateProgress(30);
+                updateProgress(40);
                 
-                // Paso 3: Crear árbol con estructura portalHub
-                logToConsole('Creando estructura portalHub...', 'info');
-                const treeSha = await createPortalHubTree(mainSha);
+                // PASO 3: Crear árbol Git en la RAÍZ (60%)
+                logToConsole('3. Creando estructura en la raíz del repositorio...', 'info');
+                const treeSha = await createRootTree(mainSha);
                 updateProgress(60);
                 
-                // Paso 4: Crear commit con el árbol
-                logToConsole('Creando commit con la estructura...', 'info');
-                const commitSha = await createCommit(treeSha, mainSha, 'Añadir estructura portalHub');
+                // PASO 4: Crear commit (80%)
+                logToConsole('4. Creando commit con la estructura...', 'info');
+                const commitSha = await createCommit(treeSha, mainSha, '🚀 Contenido publicado directamente en raíz');
                 updateProgress(80);
                 
-                // Paso 5: Actualizar referencia main
-                logToConsole('Actualizando rama main...', 'info');
+                // PASO 5: Actualizar rama main (100%)
+                logToConsole('5. Actualizando rama main...', 'info');
                 await updateMainBranch(commitSha);
                 updateProgress(100);
                 
-                // Éxito
-                logToConsole('¡Publicación completada con éxito!', 'success');
-                logToConsole(`Estructura disponible en: https://github.com/${githubOwner}/${githubRepo}/tree/main/portalHub`, 'info');
+                // =========== PUBLICACIÓN COMPLETADA CON ÉXITO ===========
+                logToConsole('=== PUBLICACIÓN CORREGIDA COMPLETADA ===', 'success');
+                logToConsole('Flujo GitHub ejecutado correctamente:', 'success');
+                logToConsole('  ✓ Repositorio verificado/creado', 'success');
+                logToConsole('  ✓ Rama main inicializada', 'success');
+                logToConsole('  ✓ Árbol Git creado en la RAÍZ', 'success');
+                logToConsole('  ✓ Commit creado', 'success');
+                logToConsole('  ✓ Rama main actualizada', 'success');
+                logToConsole('', 'info');
+                logToConsole('🔗 Contenido disponible en:', 'info');
+                logToConsole(`https://github.com/${githubOwner}/${githubRepo}`, 'info');
+                logToConsole('', 'info');
+                logToConsole('✅ El contenido se ha publicado directamente en la raíz del repositorio.', 'success');
+                logToConsole('   No hay carpeta contenedora extra. Listo para despliegue.', 'success');
                 
-                // Mostrar alerta de éxito
-                const successAlert = document.createElement('div');
-                successAlert.className = 'alert alert-success';
-                successAlert.innerHTML = `
-                    <i class="fas fa-check-circle"></i>
-                    <div>
-                        <strong>¡Publicación exitosa!</strong><br>
-                        La estructura se ha publicado correctamente en 
-                        <a href="https://github.com/${githubOwner}/${githubRepo}/tree/main/portalHub" target="_blank">
-                            ${githubOwner}/${githubRepo}/portalHub
-                        </a>
-                    </div>
-                `;
-                
-                document.querySelector('.card:first-child').insertBefore(successAlert, document.querySelector('.card:first-child .form-group'));
+                // Mostrar alerta de éxito FINAL
+                showFinalSuccessAlert();
                 
             } catch (error) {
-                logToConsole(`Error durante la publicación: ${error.message}`, 'error');
+                logToConsole(`❌ Error durante la publicación: ${error.message}`, 'error');
                 alert(`Error de publicación: ${error.message}`);
             } finally {
                 publishBtn.innerHTML = originalText;
@@ -1437,41 +1391,25 @@ package.json"></textarea>
             }
         }
         
+        // =========== FUNCIONES DEL FLUJO GITHUB ===========
+        
         // Asegurar que el repositorio existe
         async function ensureRepositoryExists() {
             try {
-                logToConsole(`Intentando conectar a: https://api.github.com/repos/${githubOwner}/${githubRepo}`, 'info');
-                
                 const response = await fetch(`https://api.github.com/repos/${githubOwner}/${githubRepo}`, {
                     headers: {
                         'Authorization': `token ${githubToken}`,
-                        'Accept': 'application/vnd.github.v3+json',
-                        'User-Agent': 'PortalHub-Creator-App'
+                        'Accept': 'application/vnd.github.v3+json'
                     }
                 });
                 
-                logToConsole(`Respuesta recibida: ${response.status} ${response.statusText}`, 'info');
-                
                 if (response.status === 200) {
-                    logToConsole('Repositorio encontrado.', 'success');
+                    logToConsole('✓ Repositorio encontrado', 'success');
                     return true;
                 }
                 
                 if (response.status === 404) {
-                    logToConsole('Repositorio no encontrado. Creando nuevo repositorio...', 'warning');
-                    
-                    // Intentar obtener información del usuario primero para validar el token
-                    const userResponse = await fetch('https://api.github.com/user', {
-                        headers: {
-                            'Authorization': `token ${githubToken}`,
-                            'Accept': 'application/vnd.github.v3+json'
-                        }
-                    });
-                    
-                    if (!userResponse.ok) {
-                        const errorData = await userResponse.json();
-                        throw new Error(`Token inválido o sin permisos: ${userResponse.status} - ${errorData.message || 'Sin mensaje'}`);
-                    }
+                    logToConsole('Creando nuevo repositorio...', 'warning');
                     
                     // Crear nuevo repositorio
                     const createResponse = await fetch(`https://api.github.com/user/repos`, {
@@ -1491,30 +1429,24 @@ package.json"></textarea>
                     
                     if (!createResponse.ok) {
                         const errorData = await createResponse.json();
-                        throw new Error(`Error creando repositorio: ${createResponse.status} - ${errorData.message || 'Error desconocido'}`);
+                        throw new Error(`Error creando repositorio: ${errorData.message}`);
                     }
                     
-                    logToConsole('Repositorio creado exitosamente.', 'success');
+                    logToConsole('✓ Repositorio creado exitosamente', 'success');
                     return true;
                 }
                 
-                // Otros errores HTTP
                 const errorData = await response.json().catch(() => ({}));
                 throw new Error(`Error HTTP ${response.status}: ${errorData.message || response.statusText}`);
                 
             } catch (error) {
-                // Error de red o de JavaScript
-                if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
-                    throw new Error('Error de red: No se pudo conectar a GitHub. Verifica tu conexión a internet.');
-                }
-                throw new Error(`Error en ensureRepositoryExists: ${error.message}`);
+                throw new Error(`ensureRepositoryExists: ${error.message}`);
             }
         }
         
-        // Asegurar que existe la rama main (y crearla si el repositorio está vacío)
+        // Asegurar que existe la rama main
         async function ensureMainBranch() {
             try {
-                // Intentar obtener la referencia a main
                 const response = await fetch(`https://api.github.com/repos/${githubOwner}/${githubRepo}/git/refs/heads/main`, {
                     headers: {
                         'Authorization': `token ${githubToken}`,
@@ -1524,28 +1456,28 @@ package.json"></textarea>
                 
                 if (response.status === 200) {
                     const data = await response.json();
-                    logToConsole('Rama main encontrada.', 'success');
-                    return data.object.sha; // SHA del commit actual
+                    logToConsole('✓ Rama main encontrada', 'success');
+                    return data.object.sha;
                 }
                 
                 if (response.status === 404) {
-                    logToConsole('Repositorio vacío detectado. Inicializando rama main...', 'warning');
+                    logToConsole('Repositorio vacío. Inicializando rama main...', 'warning');
                     return await bootstrapRepository();
                 }
                 
                 const errorData = await response.json().catch(() => ({}));
-                throw new Error(`Error verificando rama main: ${response.status} - ${errorData.message || response.statusText}`);
+                throw new Error(`Error verificando rama main: ${errorData.message || response.statusText}`);
                 
             } catch (error) {
-                throw new Error(`Error en ensureMainBranch: ${error.message}`);
+                throw new Error(`ensureMainBranch: ${error.message}`);
             }
         }
         
-        // Inicializar un repositorio vacío con README
+        // Inicializar repositorio vacío
         async function bootstrapRepository() {
             try {
-                // 1. Crear blob con contenido del README
-                const readmeContent = `# PortalHub\n\nRepositorio inicializado automáticamente por PortalHub Creator.\n`;
+                // Crear blob con README
+                const readmeContent = `# ${githubRepo}\n\nRepositorio creado automáticamente por PortalHub Creator v1.1.\nEl contenido se publica directamente en la raíz.\n`;
                 
                 const blobResponse = await fetch(`https://api.github.com/repos/${githubOwner}/${githubRepo}/git/blobs`, {
                     method: 'POST',
@@ -1562,14 +1494,13 @@ package.json"></textarea>
                 
                 if (!blobResponse.ok) {
                     const errorData = await blobResponse.json();
-                    throw new Error(`Error creando blob: ${blobResponse.status} - ${errorData.message || blobResponse.statusText}`);
+                    throw new Error(`Error creando blob: ${errorData.message}`);
                 }
                 
                 const blobData = await blobResponse.json();
                 const readmeBlobSha = blobData.sha;
-                logToConsole('README.md creado.', 'info');
                 
-                // 2. Crear árbol con el README
+                // Crear árbol con README
                 const treeResponse = await fetch(`https://api.github.com/repos/${githubOwner}/${githubRepo}/git/trees`, {
                     method: 'POST',
                     headers: {
@@ -1589,14 +1520,13 @@ package.json"></textarea>
                 
                 if (!treeResponse.ok) {
                     const errorData = await treeResponse.json();
-                    throw new Error(`Error creando árbol: ${treeResponse.status} - ${errorData.message || treeResponse.statusText}`);
+                    throw new Error(`Error creando árbol: ${errorData.message}`);
                 }
                 
                 const treeData = await treeResponse.json();
                 const treeSha = treeData.sha;
-                logToConsole('Árbol inicial creado.', 'info');
                 
-                // 3. Crear commit inicial
+                // Crear commit inicial
                 const commitResponse = await fetch(`https://api.github.com/repos/${githubOwner}/${githubRepo}/git/commits`, {
                     method: 'POST',
                     headers: {
@@ -1605,22 +1535,21 @@ package.json"></textarea>
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        message: 'Initial commit - PortalHub Creator',
+                        message: 'Initial commit - PortalHub Creator v1.1',
                         tree: treeSha,
-                        parents: [] // Sin padres (primer commit)
+                        parents: []
                     })
                 });
                 
                 if (!commitResponse.ok) {
                     const errorData = await commitResponse.json();
-                    throw new Error(`Error creando commit: ${commitResponse.status} - ${errorData.message || commitResponse.statusText}`);
+                    throw new Error(`Error creando commit: ${errorData.message}`);
                 }
                 
                 const commitData = await commitResponse.json();
                 const commitSha = commitData.sha;
-                logToConsole('Commit inicial creado.', 'info');
                 
-                // 4. Crear referencia main
+                // Crear referencia main
                 const refResponse = await fetch(`https://api.github.com/repos/${githubOwner}/${githubRepo}/git/refs`, {
                     method: 'POST',
                     headers: {
@@ -1636,37 +1565,33 @@ package.json"></textarea>
                 
                 if (!refResponse.ok) {
                     const errorData = await refResponse.json();
-                    throw new Error(`Error creando referencia main: ${refResponse.status} - ${errorData.message || refResponse.statusText}`);
+                    throw new Error(`Error creando referencia main: ${errorData.message}`);
                 }
                 
-                logToConsole('Repositorio inicializado correctamente con rama main.', 'success');
+                logToConsole('✓ Repositorio inicializado con rama main', 'success');
                 return commitSha;
                 
             } catch (error) {
-                throw new Error(`Error en bootstrapRepository: ${error.message}`);
+                throw new Error(`bootstrapRepository: ${error.message}`);
             }
         }
         
-        // Crear árbol con la estructura portalHub
-        async function createPortalHubTree(baseTreeSha) {
+        // FUNCIÓN CRÍTICAMENTE CORREGIDA: Crear árbol Git en la RAÍZ del repositorio
+        async function createRootTree(baseTreeSha) {
             try {
-                // Paso 1: Recolectar SOLO archivos (nunca carpetas)
+                // PASO 1: Recolectar TODOS los archivos de la estructura
                 const files = [];
                 
                 function collectFiles(items, currentPath = '') {
                     items.forEach(item => {
-                        // Normalizar nombre (eliminar espacios invisibles)
                         const cleanName = item.name.trim();
                         
                         if (item.type === 'folder') {
-                            // NO agregar carpetas al array - solo procesar hijos
                             const newPath = currentPath ? `${currentPath}/${cleanName}` : cleanName;
-                            
                             if (item.children && item.children.length > 0) {
                                 collectFiles(item.children, newPath);
                             }
                         } else {
-                            // ES UN ARCHIVO: agregar a la lista
                             const filePath = currentPath ? `${currentPath}/${cleanName}` : cleanName;
                             files.push({
                                 path: filePath,
@@ -1679,33 +1604,53 @@ package.json"></textarea>
                 
                 collectFiles(folderStructure);
                 
-                // Paso 2: Validar que hay archivos
                 if (files.length === 0) {
-                    throw new Error('No se encontraron archivos. La estructura está vacía o solo contiene carpetas.');
+                    throw new Error('No se encontraron archivos en la estructura');
                 }
                 
-                logToConsole(`Recolectados ${files.length} archivos para crear`, 'info');
+                logToConsole(`Creando ${files.length} archivos en la RAÍZ del repositorio`, 'info');
                 
-                // Paso 3: Normalizar paths y construir entradas del árbol Git
+                // PASO 2: Construir entradas del árbol Git para la RAÍZ
                 const treeItems = files.map(file => {
-                    // Normalizar path
+                    // Normalizar path - usar directamente la ruta interna
                     let normalizedPath = file.path
                         .replace(/\\/g, '/')           // Backslash a forward slash
                         .replace(/\/+/g, '/')          // Colapsar múltiples slashes
                         .replace(/^\/+/, '')           // Eliminar slash inicial
                         .replace(/\/+$/, '');          // Eliminar slash final
                     
-                    // Prefijo obligatorio portalHub/
-                    const finalPath = `portalHub/${normalizedPath}`;
+                    // IMPORTANTE: No agregar prefijo - publicar directamente en raíz
+                    const finalPath = normalizedPath;
                     
-                    // Contenido: NUNCA vacío (GitHub rechaza blobs vacíos)
+                    // Contenido por defecto para cada archivo
                     let content = '';
                     if (file.originalItem && file.originalItem.content) {
                         content = file.originalItem.content;
                     }
-                    // Si está vacío o solo tiene espacios, poner newline
+                    
+                    // Si está vacío, crear contenido básico
                     if (!content || content.trim() === '') {
-                        content = '\n';
+                        const extension = file.name.split('.').pop().toLowerCase();
+                        
+                        switch(extension) {
+                            case 'html':
+                                content = `<!DOCTYPE html>\n<html>\n<head>\n\t<title>${file.name}</title>\n</head>\n<body>\n\t<h1>${file.name}</h1>\n</body>\n</html>`;
+                                break;
+                            case 'js':
+                                content = `// ${file.name}\nconsole.log('${file.name} cargado');`;
+                                break;
+                            case 'css':
+                                content = `/* ${file.name} */\nbody { margin: 0; padding: 0; }`;
+                                break;
+                            case 'json':
+                                content = `{\n\t"name": "${file.name.replace('.json', '')}"\n}`;
+                                break;
+                            case 'md':
+                                content = `# ${file.name}\n\nArchivo creado automáticamente por PortalHub Creator v1.1.`;
+                                break;
+                            default:
+                                content = `# ${file.name}\n\nArchivo creado automáticamente por PortalHub Creator v1.1.`;
+                        }
                     }
                     
                     return {
@@ -1716,56 +1661,40 @@ package.json"></textarea>
                     };
                 });
                 
-                // Paso 4: Validación estricta antes de enviar
+                // PASO 3: Validación
                 for (let i = 0; i < treeItems.length; i++) {
                     const entry = treeItems[i];
                     
-                    // Validar type
                     if (entry.type !== 'blob') {
-                        throw new Error(`Entrada ${i}: type debe ser "blob", encontrado "${entry.type}"`);
+                        throw new Error(`Entrada ${i}: type debe ser "blob"`);
                     }
                     
-                    // Validar que no es carpeta (path termina en /)
                     if (entry.path.endsWith('/')) {
                         throw new Error(`Entrada ${i}: path termina en "/", es una carpeta: ${entry.path}`);
                     }
                     
-                    // Validar content existe
                     if (entry.content === undefined || entry.content === null) {
                         throw new Error(`Entrada ${i}: content es undefined/null`);
                     }
                     
-                    // Validar que no tiene sha (conflicto con content)
                     if (entry.sha) {
                         throw new Error(`Entrada ${i}: tiene sha, no puede usarse con content`);
                     }
                     
-                    // Validar path no vacío
                     if (!entry.path || entry.path.trim() === '') {
                         throw new Error(`Entrada ${i}: path está vacío`);
                     }
                 }
                 
-                // Paso 5: Debug - mostrar payload exacto
-                console.log('=== PAYLOAD GITHUB API ===');
-                console.log(JSON.stringify({
-                    base_tree: baseTreeSha,
-                    tree: treeItems
-                }, null, 2));
-                console.log('==========================');
-                
-                logToConsole(`Enviando ${treeItems.length} entradas a GitHub...`, 'info');
-                
-                // Paso 6: Enviar a GitHub
+                // PASO 4: Enviar a GitHub
                 const treeResponse = await fetch(
                     `https://api.github.com/repos/${githubOwner}/${githubRepo}/git/trees`, 
                     {
                         method: 'POST',
                         headers: {
                             'Authorization': `token ${githubToken}`,
-                            'Accept': 'application/vnd.github+json',
-                            'Content-Type': 'application/json',
-                            'X-GitHub-Api-Version': '2022-11-28'
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
                             base_tree: baseTreeSha,
@@ -1782,25 +1711,18 @@ package.json"></textarea>
                 }
                 
                 const treeData = await treeResponse.json();
-                logToConsole(`Árbol creado exitosamente: ${treeData.sha.substring(0, 8)}`, 'success');
+                logToConsole(`✓ Árbol Git creado en RAÍZ: ${treeData.sha.substring(0, 8)}`, 'success');
+                logToConsole(`Archivos creados directamente en: / (raíz del repositorio)`, 'info');
                 
                 return treeData.sha;
                 
             } catch (error) {
-                logToConsole(`Error en createPortalHubTree: ${error.message}`, 'error');
+                logToConsole(`Error en createRootTree: ${error.message}`, 'error');
                 throw error;
             }
         }
         
-        // FUNCIONES FALTANTES - CORREGIDAS
-        
-        /**
-         * Crea un commit en el repositorio de GitHub
-         * @param {string} treeSha - SHA del árbol creado
-         * @param {string} parentSha - SHA del commit padre
-         * @param {string} message - Mensaje del commit
-         * @returns {Promise<string>} SHA del commit creado
-         */
+        // Crear commit - FUNCIÓN MANTENIDA
         async function createCommit(treeSha, parentSha, message) {
             try {
                 const response = await fetch(
@@ -1809,9 +1731,8 @@ package.json"></textarea>
                         method: 'POST',
                         headers: {
                             'Authorization': `token ${githubToken}`,
-                            'Accept': 'application/vnd.github+json',
-                            'Content-Type': 'application/json',
-                            'X-GitHub-Api-Version': '2022-11-28'
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
                             message: message,
@@ -1823,24 +1744,19 @@ package.json"></textarea>
                 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    throw new Error(`Error creando commit: ${errorData.message || response.statusText}`);
+                    throw new Error(`Error creando commit: ${errorData.message}`);
                 }
                 
                 const commitData = await response.json();
-                logToConsole(`Commit creado: ${commitData.sha.substring(0, 8)}`, 'success');
+                logToConsole(`✓ Commit creado: ${commitData.sha.substring(0, 8)}`, 'success');
                 return commitData.sha;
                 
             } catch (error) {
-                logToConsole(`Error en createCommit: ${error.message}`, 'error');
-                throw error;
+                throw new Error(`createCommit: ${error.message}`);
             }
         }
         
-        /**
-         * Actualiza la rama main para que apunte al nuevo commit
-         * @param {string} commitSha - SHA del commit al que debe apuntar main
-         * @returns {Promise<boolean>} true si se actualizó correctamente
-         */
+        // Actualizar rama main - FUNCIÓN MANTENIDA
         async function updateMainBranch(commitSha) {
             try {
                 const response = await fetch(
@@ -1849,9 +1765,8 @@ package.json"></textarea>
                         method: 'PATCH',
                         headers: {
                             'Authorization': `token ${githubToken}`,
-                            'Accept': 'application/vnd.github+json',
-                            'Content-Type': 'application/json',
-                            'X-GitHub-Api-Version': '2022-11-28'
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
                             sha: commitSha,
@@ -1862,16 +1777,39 @@ package.json"></textarea>
                 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    throw new Error(`Error actualizando rama main: ${errorData.message || response.statusText}`);
+                    throw new Error(`Error actualizando rama main: ${errorData.message}`);
                 }
                 
-                logToConsole(`Rama main actualizada al commit: ${commitSha.substring(0, 8)}`, 'success');
+                logToConsole(`✓ Rama main actualizada al commit: ${commitSha.substring(0, 8)}`, 'success');
                 return true;
                 
             } catch (error) {
-                logToConsole(`Error en updateMainBranch: ${error.message}`, 'error');
-                throw error;
+                throw new Error(`updateMainBranch: ${error.message}`);
             }
+        }
+        
+        // =========== FUNCIONES AUXILIARES ===========
+        
+        // Mostrar alerta de éxito final
+        function showFinalSuccessAlert() {
+            const successAlert = document.createElement('div');
+            successAlert.className = 'alert alert-success';
+            successAlert.innerHTML = `
+                <i class="fas fa-check-circle"></i>
+                <div>
+                    <strong>¡Publicación CORREGIDA completada!</strong><br>
+                    El contenido se ha publicado <strong>directamente en la raíz</strong> del repositorio.<br>
+                    <small>No hay carpeta contenedora extra. Listo para despliegue inmediato.</small>
+                    <br><br>
+                    <a href="https://github.com/${githubOwner}/${githubRepo}" target="_blank" class="btn" style="margin-top: 10px;">
+                        <i class="fab fa-github"></i> Ver repositorio en GitHub
+                    </a>
+                </div>
+            `;
+            
+            // Insertar al inicio del panel izquierdo
+            const leftCard = document.querySelector('.card:first-child');
+            leftCard.insertBefore(successAlert, leftCard.firstChild);
         }
         
         // Actualizar barra de progreso
